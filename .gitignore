@@ -7,3 +7,10 @@ app/export_presets.cfg
 # Mono-specific ignores
 app/.mono/
 app/data_*/
+
+# Rust-specific ignores
+engine/target
+engine/Cargo.lock
+
+# Built engine DLLs
+app/engine/engine.dll
