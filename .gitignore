@@ -1,12 +1,28 @@
-
-# MAUI-specific ignores
+# Xamarin-specific ignores
 app/.vs/
-app/Sudoverse/bin/
-app/Sudoverse/obj/
+app/Engine/Engine.Android/bin/
+app/Engine/Engine.Android/obj/
+app/Engine/Engine.iOS/bin/
+app/Engine/Engine.iOS/obj/
+app/Engine/Engine.iOS/Native References/
+app/Engine/Engine.UWP/bin/
+app/Engine/Engine.UWP/obj/
+app/Sudoverse/Sudoverse.Android/bin/
+app/Sudoverse/Sudoverse.Android/obj/
+app/Sudoverse/Sudoverse.iOS/bin/
+app/Sudoverse/Sudoverse.iOS/obj/
+app/Sudoverse/Sudoverse.UWP/BundleArtifacts/
+app/Sudoverse/Sudoverse.UWP/bin/
+app/Sudoverse/Sudoverse.UWP/obj/
+app/Sudoverse/Sudoverse/bin/
+app/Sudoverse/Sudoverse/obj/
 
 # Rust-specific ignores
-engine/target
+engine/target/
+engine/lib/
 engine/Cargo.lock
 
 # Built engine DLLs
-app\Sudoverse\Resources\engine.dll
+app/Engine/Engine.Android/lib/*/libengine.so
+app/Engine/Engine.iOS/lib/*/libengine.a
+app/Engine/Engine.UWP/lib/*/engine.dll
