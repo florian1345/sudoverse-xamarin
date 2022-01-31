@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sudoverse
+namespace Sudoverse.Engine
 {
     public static class SudokuEngineProvider
     {

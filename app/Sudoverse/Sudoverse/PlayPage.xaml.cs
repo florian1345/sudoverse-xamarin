@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Sudoverse.Display;
+using Sudoverse.Engine;
+using System;
 using Xamarin.Forms;
 
 namespace Sudoverse
 {
-	public partial class PlayPage : ContentPage
+    public partial class PlayPage : ContentPage
 	{
 		private SudokuView sudokuView;
 

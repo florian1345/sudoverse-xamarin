@@ -2,13 +2,16 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace Sudoverse
+namespace Sudoverse.Display
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SudokuCellView : ContentView
     {
         private static readonly Color LockedColor = Color.Black;
         private static readonly Color UnlockedColor = Color.Blue;
+
+        private static readonly Color SelectedColor = Color.FromRgba(0, 0, 1, 0.1);
+        private static readonly Color UnselectedColor = Color.Transparent;
 
         public event EventHandler Tapped;
 
@@ -28,12 +31,12 @@ namespace Sudoverse
 
         public void Select()
         {
-            Background.Color = Color.LightBlue;
+            Background.Color = SelectedColor;
         }
 
         public void Deselect()
         {
-            Background.Color = Color.White;
+            Background.Color = UnselectedColor;
         }
 
         /// <summary>

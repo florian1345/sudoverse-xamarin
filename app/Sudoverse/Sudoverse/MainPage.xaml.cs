@@ -1,10 +1,11 @@
 ﻿using Sudoverse.Constraint;
+using Sudoverse.Engine;
 using System;
 using Xamarin.Forms;
 
 namespace Sudoverse
 {
-	public partial class MainPage : ContentPage
+    public partial class MainPage : ContentPage
 	{
 		public MainPage()
 		{
@@ -16,7 +17,7 @@ namespace Sudoverse
 
 				// Since Xamarin does not allow us to exit the app, we make it useless instead.
 
-				ButtonEditor.IsEnabled = false;
+				ButtonPlay.IsEnabled = false;
 			}
 		}
 

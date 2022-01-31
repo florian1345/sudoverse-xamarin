@@ -15,7 +15,7 @@
                 HorizontalOptions="Center" />-->
 
             <Button
-                x:Name="ButtonEditor"
+                x:Name="ButtonPlay"
                 Text="Play"
                 FontAttributes="Bold"
                 Grid.Row="1"
