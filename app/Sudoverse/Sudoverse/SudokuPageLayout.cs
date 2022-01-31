@@ -14,7 +14,8 @@ namespace Sudoverse
     public class SudokuPageLayout : Layout<View>
     {
         private const double FONT_SIZE_FACTOR = 0.05;
-        private const double SUDOKU_SIZE_FACTOR = 0.8;
+        private const double SUDOKU_SIZE_FACTOR = 0.67;
+        private const double SPACING_FACTOR = 0.05;
 
         private IEnumerable<View> GetAllChildren(View v)
         {
@@ -48,15 +49,19 @@ namespace Sudoverse
         private void LayoutVertical(
             double x, double y, double width, double height, View sudoku, IEnumerable<View> menu)
         {
-            double sudokuSize = Math.Min(SUDOKU_SIZE_FACTOR * height, width);
-            double menuHeight = height - sudokuSize;
+            double spacing = SPACING_FACTOR * Math.Min(width, height);
+            double remainingWidth = width - 2 * spacing;
+            double remainingHeight = height - 3 * spacing;
+            double sudokuSize = Math.Min(SUDOKU_SIZE_FACTOR * remainingHeight, remainingWidth);
+            double menuHeight = remainingHeight - sudokuSize;
 
             double sudokuX = x + (width - sudokuSize) * 0.5;
-            LayoutChildIntoBoundingRegion(sudoku, new Rectangle(sudokuX, y, sudokuSize, sudokuSize));
+            double sudokuY = y + spacing;
+            LayoutChildIntoBoundingRegion(sudoku, new Rectangle(sudokuX, sudokuY, sudokuSize, sudokuSize));
 
-            double elementX = 0;
-            double elementY = y + sudokuSize;
-            double elementWidth = width / menu.Count();
+            double elementX = spacing;
+            double elementY = y + sudokuSize + 2 * spacing;
+            double elementWidth = remainingWidth / menu.Count();
 
             foreach (View element in menu)
             {
@@ -72,15 +77,19 @@ namespace Sudoverse
         private void LayoutHorizontal(
             double x, double y, double width, double height, View sudoku, IEnumerable<View> menu)
         {
-            double sudokuSize = Math.Min(SUDOKU_SIZE_FACTOR * width, height);
-            double menuWidth = width - sudokuSize;
+            double spacing = SPACING_FACTOR * Math.Min(width, height);
+            double remainingWidth = width - 3 * spacing;
+            double remainingHeight = height - 2 * spacing;
+            double sudokuSize = Math.Min(SUDOKU_SIZE_FACTOR * remainingWidth, remainingHeight);
+            double menuWidth = remainingWidth - sudokuSize;
 
+            double sudokuX = x + spacing;
             double sudokuY = y + (height - sudokuSize) * 0.5;
-            LayoutChildIntoBoundingRegion(sudoku, new Rectangle(x, sudokuY, sudokuSize, sudokuSize));
+            LayoutChildIntoBoundingRegion(sudoku, new Rectangle(sudokuX, sudokuY, sudokuSize, sudokuSize));
 
-            double elementX = x + sudokuSize;
-            double elementY = 0;
-            double elementHeight = height / menu.Count();
+            double elementX = x + sudokuSize + 2 * spacing;
+            double elementY = spacing;
+            double elementHeight = remainingHeight / menu.Count();
 
             foreach (View element in menu)
             {

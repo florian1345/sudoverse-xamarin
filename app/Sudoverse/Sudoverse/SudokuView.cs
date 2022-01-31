@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using Sudoverse.Constraint;
+using Xamarin.Forms;
 using Xamarin.Forms.Shapes;
 
 namespace Sudoverse
@@ -30,7 +31,11 @@ namespace Sudoverse
                     var view = new SudokuCellView();
                     int cell = Sudoku.GetCell(column, row);
 
-                    if (cell > 0) view.Enter(cell);
+                    if (cell > 0)
+                    {
+                        view.Enter(cell);
+                        view.Lock();
+                    }
 
                     cells[column, row] = view;
                     int fRow = row;
@@ -74,6 +79,22 @@ namespace Sudoverse
 
             selectedColumn = -1;
             selectedRow = -1;
+        }
+
+        public void Enter(int digit)
+        {
+            if (selectedColumn < 0 || selectedRow < 0) return;
+
+            if (cells[selectedColumn, selectedRow].Enter(digit))
+                Sudoku.SetCell(selectedColumn, selectedRow, digit);
+        }
+
+        public void ClearCell()
+        {
+            if (selectedColumn < 0 || selectedRow < 0) return;
+
+            if (cells[selectedColumn, selectedRow].Clear())
+                Sudoku.SetCell(selectedColumn, selectedRow, 0);
         }
 
         protected override void LayoutChildren(double x, double y, double width, double height)

@@ -4,9 +4,13 @@ namespace Sudoverse.UWP
 {
     internal class UwpSudokuEngine : ISudokuEngine
     {
-        public int Test()
-        {
-            return EngineDll.Test();
-        }
+        public int Test() =>
+            EngineDll.Test();
+
+        public string GenDefault() =>
+            EngineDll.GenDefault();
+
+        public bool CheckDefault(string json) =>
+            EngineDll.CheckDefault(json);
     }
 }
