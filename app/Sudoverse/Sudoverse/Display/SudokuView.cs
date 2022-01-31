@@ -1,10 +1,9 @@
-﻿using Sudoverse.Constraint;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Shapes;
 
-namespace Sudoverse
+namespace Sudoverse.Display
 {
-    internal class SudokuView : Layout<View>
+    internal sealed class SudokuView : Layout<View>
     {
         // all relative to the size of a cell
 

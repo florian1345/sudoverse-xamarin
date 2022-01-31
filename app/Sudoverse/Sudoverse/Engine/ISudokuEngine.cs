@@ -1,4 +1,4 @@
-﻿namespace Sudoverse
+﻿namespace Sudoverse.Engine
 {
     public interface ISudokuEngine
     {

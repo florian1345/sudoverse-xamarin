@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xamarin.Forms;
 
-namespace Sudoverse
+namespace Sudoverse.Display
 {
     /// <summary>
     /// Lays out the given Sudoku as a large square at the start of the longer axis (i.e. at the
