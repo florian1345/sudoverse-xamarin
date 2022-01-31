@@ -1,11 +1,10 @@
 ﻿using Sudoverse.Display;
 using Sudoverse.Engine;
 using System;
-using Xamarin.Forms;
 
 namespace Sudoverse
 {
-    public partial class PlayPage : ContentPage
+    public partial class PlayPage : KeyListenerPage
 	{
 		private SudokuView sudokuView;
 
@@ -14,9 +13,47 @@ namespace Sudoverse
 			InitializeComponent();
 			sudokuView = new SudokuView(sudoku);
 			Layout.Children.Insert(0, sudokuView);
+            KeyPressed += OnKeyPressed;
 		}
 
-		private void OnOne(object sender, EventArgs e)
+        private void OnKeyPressed(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+				case Key.Digit1:
+					sudokuView.Enter(1);
+					break;
+				case Key.Digit2:
+					sudokuView.Enter(2);
+					break;
+				case Key.Digit3:
+					sudokuView.Enter(3);
+					break;
+				case Key.Digit4:
+					sudokuView.Enter(4);
+					break;
+				case Key.Digit5:
+					sudokuView.Enter(5);
+					break;
+				case Key.Digit6:
+					sudokuView.Enter(6);
+					break;
+				case Key.Digit7:
+					sudokuView.Enter(7);
+					break;
+				case Key.Digit8:
+					sudokuView.Enter(8);
+					break;
+				case Key.Digit9:
+					sudokuView.Enter(9);
+					break;
+				case Key.Delete:
+					sudokuView.ClearCell();
+					break;
+			}
+        }
+
+        private void OnOne(object sender, EventArgs e)
 		{
 			sudokuView.Enter(1);
 		}
