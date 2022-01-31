@@ -10,5 +10,8 @@ namespace Engine
 
         [DllImport(DllName, EntryPoint = "test")]
         public static extern int Test();
+
+        [DllImport(DllName, EntryPoint = "gen_default")]
+        public static extern byte[] GenDefault();
     }
 }

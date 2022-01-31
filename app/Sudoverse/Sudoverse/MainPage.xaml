@@ -16,10 +16,10 @@
 
             <Button
                 x:Name="ButtonEditor"
-                Text="Editor"
+                Text="Play"
                 FontAttributes="Bold"
                 Grid.Row="1"
-                Clicked="OnEditor"
+                Clicked="OnPlay"
                 HorizontalOptions="Center" />
 
         </Grid>

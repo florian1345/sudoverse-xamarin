@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sudoverse.Constraint;
+using System;
 using Xamarin.Forms;
 
 namespace Sudoverse
@@ -36,9 +37,11 @@ namespace Sudoverse
             }
 		}
 
-		private void OnEditor(object sender, EventArgs e)
+		private void OnPlay(object sender, EventArgs e)
 		{
-			App.Current.MainPage = new EditorPage();
+			string json = SudokuEngineProvider.Engine.GenDefault();
+			Sudoku sudoku = Sudoku.ParseJson<StatelessConstraint>(json);
+			App.Current.MainPage = new PlayPage(sudoku);
 		}
 	}
 }

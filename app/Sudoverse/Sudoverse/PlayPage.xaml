@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Sudoverse.PlayPage"
+             xmlns:layouts="clr-namespace:Sudoverse;assembly=Sudoverse">
+
+    <layouts:SudokuPageLayout x:Name="Layout">
+        <Grid
+            x:Name="Buttons"
+            RowSpacing="10"
+            ColumnSpacing="10" >
+
+            <Button
+                Text="1"
+                FontAttributes="Bold"
+                Clicked="OnOne"
+                HorizontalOptions="Fill"
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="2"
+                FontAttributes="Bold"
+                Clicked="OnTwo"
+                HorizontalOptions="Fill"
+                Grid.Row="0"
+                Grid.Column="2"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="3"
+                FontAttributes="Bold"
+                Clicked="OnThree"
+                HorizontalOptions="Fill"
+                Grid.Row="0"
+                Grid.Column="4"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="4"
+                FontAttributes="Bold"
+                Clicked="OnFour"
+                HorizontalOptions="Fill"
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="5"
+                FontAttributes="Bold"
+                Clicked="OnFive"
+                HorizontalOptions="Fill"
+                Grid.Row="1"
+                Grid.Column="2"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="6"
+                FontAttributes="Bold"
+                Clicked="OnSix"
+                HorizontalOptions="Fill"
+                Grid.Row="1"
+                Grid.Column="4"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="7"
+                FontAttributes="Bold"
+                Clicked="OnSeven"
+                HorizontalOptions="Fill"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="8"
+                FontAttributes="Bold"
+                Clicked="OnEight"
+                HorizontalOptions="Fill"
+                Grid.Row="2"
+                Grid.Column="2"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="9"
+                FontAttributes="Bold"
+                Clicked="OnNine"
+                HorizontalOptions="Fill"
+                Grid.Row="2"
+                Grid.Column="4"
+                Grid.ColumnSpan="2" />
+
+            <Button
+                Text="Clear"
+                FontAttributes="Bold"
+                Clicked="OnClear"
+                HorizontalOptions="Fill"
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="3" />
+
+            <Button
+                Text="Check"
+                FontAttributes="Bold"
+                Clicked="OnCheck"
+                HorizontalOptions="Fill"
+                Grid.Row="3"
+                Grid.Column="3"
+                Grid.ColumnSpan="3" />
+
+            <Button
+                Text="Back"
+                FontAttributes="Bold"
+                Clicked="OnBack"
+                HorizontalOptions="Fill"
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="3" />
+        </Grid>
+    </layouts:SudokuPageLayout>
+
+</ContentPage>
