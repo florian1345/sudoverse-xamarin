@@ -38,4 +38,4 @@ Ideally, the app should work on UWP (Universal Windows), Android, and iOS,
 however currently only UWP is actively tested. Linux and macOS may be supported
 in the future.
 
-[sudoku-variants](https://crates.io/crates/sudoku-variants)
+[sudoku-variants]: https://crates.io/crates/sudoku-variants
