@@ -1,5 +1,6 @@
 ﻿using Sudoverse.Constraint;
 using Sudoverse.Engine;
+using Sudoverse.SudokuModel;
 using System;
 using Xamarin.Forms;
 

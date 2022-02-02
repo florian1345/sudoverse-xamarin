@@ -5,15 +5,50 @@
     <ContentView.Content>
         <AbsoluteLayout>
             <BoxView Color="Transparent"
-                AbsoluteLayout.LayoutBounds="0.5,0.5,1,1"
+                AbsoluteLayout.LayoutBounds="0.0,0.0,1,1"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="Background" />
+            <!-- These numbers look stupid, but somehow they align the labels rather well. -->
             <Label Text=""
-                AbsoluteLayout.LayoutBounds="0.5,0.5,1,1"
+                AbsoluteLayout.LayoutBounds="0.4,0.3,0.8,0.8"
                 AbsoluteLayout.LayoutFlags="All"
-                x:Name="Label"
+                x:Name="LabelCenter"
                 HorizontalTextAlignment="Center"
-                VerticalTextAlignment="Center" />
+                VerticalTextAlignment="Center"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill" />
+            <Label Text=""
+                AbsoluteLayout.LayoutBounds="0,0.025,0.25,0.25"
+                AbsoluteLayout.LayoutFlags="All"
+                x:Name="LabelTopLeft"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill" />
+            <Label Text=""
+                AbsoluteLayout.LayoutBounds="0.95,0.025,0.25,0.25"
+                AbsoluteLayout.LayoutFlags="All"
+                x:Name="LabelTopRight"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill" />
+            <Label Text=""
+                AbsoluteLayout.LayoutBounds="0,0.875,0.25,0.25"
+                AbsoluteLayout.LayoutFlags="All"
+                x:Name="LabelBottomLeft"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill" />
+            <Label Text=""
+                AbsoluteLayout.LayoutBounds="0.95,0.875,0.25,0.25"
+                AbsoluteLayout.LayoutFlags="All"
+                x:Name="LabelBottomRight"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill" />
         </AbsoluteLayout>
     </ContentView.Content>
 </ContentView>

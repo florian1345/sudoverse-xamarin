@@ -3,9 +3,9 @@ using Newtonsoft.Json.Linq;
 using Sudoverse.Constraint;
 using System;
 
-namespace Sudoverse
+namespace Sudoverse.SudokuModel
 {
-    internal sealed class ParseSudokuException : Exception
+    public sealed class ParseSudokuException : Exception
     {
         public ParseSudokuException()
             : base("Invalid JSON data for Sudoku.") { }
@@ -13,14 +13,14 @@ namespace Sudoverse
 
     public sealed class Sudoku
     {
-        internal int BlockWidth { get; private set; }
-        internal int BlockHeight { get; private set; }
-        internal int Size { get; private set; }
-        internal IConstraint Constraint { get; private set; }
+        public int BlockWidth { get; private set; }
+        public int BlockHeight { get; private set; }
+        public int Size { get; private set; }
+        public IConstraint Constraint { get; private set; }
 
-        private int[] cells;
+        private SudokuCell[] cells;
 
-        internal Sudoku(int blockWidth, int blockHeight, IConstraint constraint)
+        public Sudoku(int blockWidth, int blockHeight, IConstraint constraint)
         {
             if (blockWidth <= 0 || blockHeight <= 0)
                 throw new ArgumentException("Block width and height must be positive.");
@@ -28,27 +28,43 @@ namespace Sudoverse
             BlockWidth = blockWidth;
             BlockHeight = blockHeight;
             Size = BlockWidth * BlockHeight;
-            cells = new int[Size * Size];
             Constraint = constraint;
+            cells = new SudokuCell[Size * Size];
+
+            for (int i = 0; i < cells.Length; i++)
+            {
+                cells[i] = new SudokuCell();
+            }
         }
 
-        internal int GetCell(int x, int y)
+        public SudokuCell GetCell(int column, int row) =>
+            cells[row * Size + column];
+
+        public void EnterCell(int column, int row, int digit, Notation notation)
         {
-            return cells[y * Size + x];
+            var cell = cells[row * Size + column];
+
+            switch (notation)
+            {
+                case Notation.Normal:
+                    cell.EnterNormal(digit);
+                    break;
+                case Notation.Small:
+                    if (!cell.Filled) cell.ToggleSmall(digit);
+                    break;
+                case Notation.Corner:
+                    if (!cell.Filled) cell.ToggleCorner(digit);
+                    break;
+            }
         }
 
-        internal void SetCell(int x, int y, int digit)
-        {
-            cells[y * Size + x] = digit;
-        }
-
-        internal string ToJson()
+        public string ToJson()
         {
             var cellsJson = new JArray();
 
             for (int i = 0; i < cells.Length; i++)
             {
-                int cell = cells[i];
+                int cell = cells[i].Digit;
 
                 if (cell == 0) cellsJson.Add(JValue.CreateNull());
                 else cellsJson.Add(cells[i]);
@@ -101,11 +117,11 @@ namespace Sudoverse
             Sudoku result = new Sudoku(blockWidth, blockHeight, new C());
             var jsonCells = GetField<JArray>(grid, "cells");
 
-            int[] cells = new int[jsonCells.Count];
+            SudokuCell[] cells = new SudokuCell[jsonCells.Count];
 
             for (int i = 0; i < cells.Length; i++)
             {
-                cells[i] = ToInt(jsonCells[i]);
+                cells[i] = new SudokuCell(ToInt(jsonCells[i]));
             }
 
             if (cells.Length != result.cells.Length)
