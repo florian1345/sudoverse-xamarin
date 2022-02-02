@@ -59,7 +59,17 @@ namespace Sudoverse
         /// <summary>
         /// The "Backspace" or "Delete" key.
         /// </summary>
-        Delete
+        Delete,
+
+        /// <summary>
+        /// The "Shift" key.
+        /// </summary>
+        Shift,
+
+        /// <summary>
+        /// The "Control" key.
+        /// </summary>
+        Control
     }
 
     /// <summary>
@@ -89,22 +99,39 @@ namespace Sudoverse
     public abstract class KeyListenerPage : ContentPage
     {
         /// <summary>
-        /// This event is raised whenever <see cref="SendKeyPressed(object, KeyEventArgs)"/> is
+        /// This event is raised whenever <see cref="SendKeyDown(object, KeyEventArgs)"/> is
         /// called, which is the responsibility of the specific platform projects.
         /// </summary>
-        protected event EventHandler<KeyEventArgs> KeyPressed;
+        protected event EventHandler<KeyEventArgs> KeyDown;
+
+        /// <summary>
+        /// This event is raised whenever <see cref="SendKeyUp(object, KeyEventArgs)"/> is called,
+        /// which is the responsibility of the specific platform projects.
+        /// </summary>
+        protected event EventHandler<KeyEventArgs> KeyUp;
 
         protected KeyListenerPage() { }
 
         /// <summary>
-        /// Raises a key pressed event with the given arguments.
+        /// Raises a key down event with the given arguments.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">The <see cref="KeyEventArgs"/> which provide additional information
         /// about the key event.</param>
-        public void SendKeyPressed(object sender, KeyEventArgs e)
+        public void SendKeyDown(object sender, KeyEventArgs e)
         {
-            KeyPressed?.Invoke(sender, e);
+            KeyDown?.Invoke(sender, e);
+        }
+
+        /// <summary>
+        /// Raises a key up event with the given arguments.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The <see cref="KeyEventArgs"/> which provide additional information
+        /// about the key event.</param>
+        public void SendKeyUp(object sender, KeyEventArgs e)
+        {
+            KeyUp?.Invoke(sender, e);
         }
     }
 }

@@ -13,10 +13,11 @@ namespace Sudoverse
 			InitializeComponent();
 			sudokuView = new SudokuView(sudoku);
 			Layout.Children.Insert(0, sudokuView);
-            KeyPressed += OnKeyPressed;
+            KeyDown += OnKeyDown;
+			KeyUp += OnKeyUp;
 		}
 
-        private void OnKeyPressed(object sender, KeyEventArgs e)
+        private void OnKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -50,7 +51,26 @@ namespace Sudoverse
 				case Key.Delete:
 					sudokuView.ClearCell();
 					break;
+				case Key.Shift:
+					sudokuView.ShiftDown.Set();
+					break;
+				case Key.Control:
+					sudokuView.ControlDown.Set();
+					break;
 			}
+        }
+
+		private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+			switch (e.Key)
+            {
+				case Key.Shift:
+					sudokuView.ShiftDown.Reset();
+					break;
+				case Key.Control:
+					sudokuView.ControlDown.Reset();
+					break;
+            }
         }
 
         private void OnOne(object sender, EventArgs e)

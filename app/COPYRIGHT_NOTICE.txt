@@ -1,0 +1,32 @@
+The touch effect handling is copied from the TouchTrackingEffect sample in the
+Xamarin.Forms samples repository.
+
+https://github.com/xamarin/xamarin-forms-samples/tree/main/Effects/TouchTrackingEffect
+
+The following files in this project were copied from the example.
+
+- Sudoverse/Sudoverse/Touch/*
+- Sudoverse/Sudoverse.Android/TouchEffect.cs
+- Sudoverse/Sudoverse.iOS/TouchEffect.cs
+- Sudoverse/Sudoverse.iOS/TouchRecognizer.cs
+- Sudoverse/Sudoverse.UWP/TouchEffect.cs
+
+The files have been adapted to match the namespaces and other identifiers in
+this project. Where possible, the "sealed" modifier has been added. Whitespace
+may have been altered.
+
+The original sample is licensed under the following license:
+
+ Copyright 2011 Xamarin Inc
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
