@@ -7,13 +7,24 @@ namespace Sudoverse
 {
     public partial class MainPage : ContentPage
 	{
+		private sealed class LoadEngineException : Exception
+        {
+			public LoadEngineException(string message)
+				: base(message) { }
+        }
+
 		public MainPage()
 		{
 			InitializeComponent();
 
-			if (!EngineLoaded())
+			try
+            {
+				VerifyEngine();
+            }
+			catch (Exception e)
 			{
-				DisplayAlert("Error", "Could not load native engine.", "Quit");
+				string message = e is LoadEngineException ? e.Message : e.ToString();
+				DisplayAlert("Error", "Could not load native engine: " + message, "Quit");
 
 				// Since Xamarin does not allow us to exit the app, we make it useless instead.
 
@@ -21,21 +32,16 @@ namespace Sudoverse
 			}
 		}
 
-		private bool EngineLoaded()
+		private void VerifyEngine()
 		{
 			var engine = SudokuEngineProvider.Engine;
 
-			if (engine == null) return false;
+			if (engine == null) throw new LoadEngineException("Engine not set.");
 
-			try
-			{
-				int test = SudokuEngineProvider.Engine.Test();
-				return test == 42;
-			}
-			catch
-            {
-				return false;
-            }
+			int test = SudokuEngineProvider.Engine.Test();
+
+			if (test != 42)
+				throw new LoadEngineException("Engine returned wrong result: " + test);
 		}
 
 		private void OnPlay(object sender, EventArgs e)
