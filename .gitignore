@@ -16,6 +16,7 @@ app/Sudoverse/Sudoverse.UWP/bin/
 app/Sudoverse/Sudoverse.UWP/obj/
 app/Sudoverse/Sudoverse/bin/
 app/Sudoverse/Sudoverse/obj/
+app/*/*/*.csproj.user
 
 # Rust-specific ignores
 engine/target/

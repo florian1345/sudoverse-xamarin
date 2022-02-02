@@ -1,5 +1,4 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Sudoverse.Display
@@ -12,8 +11,6 @@ namespace Sudoverse.Display
 
         private static readonly Color SelectedColor = Color.FromRgba(0, 0, 1, 0.1);
         private static readonly Color UnselectedColor = Color.Transparent;
-
-        public event EventHandler Tapped;
 
         public bool Locked { get; private set; }
 
@@ -64,11 +61,6 @@ namespace Sudoverse.Display
         public void SetFontSize(double fontSize)
         {
             Label.FontSize = fontSize;
-        }
-
-        private void OnTapped(object sender, EventArgs e)
-        {
-            Tapped?.Invoke(sender, e);
         }
     }
 }
