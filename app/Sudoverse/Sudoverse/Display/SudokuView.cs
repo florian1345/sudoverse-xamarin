@@ -1,10 +1,21 @@
-﻿using Xamarin.Forms;
+﻿using Sudoverse.Touch;
+using Sudoverse.Util;
+using System;
+using System.Collections.Generic;
+using Xamarin.Forms;
 using Xamarin.Forms.Shapes;
 
 namespace Sudoverse.Display
 {
     internal sealed class SudokuView : Layout<View>
     {
+        private enum SelectMode
+        {
+            Normal,
+            Add,
+            Remove
+        }
+
         // all relative to the size of a cell
 
         private const double FONT_SIZE_FACTOR = 0.5;
@@ -16,7 +27,11 @@ namespace Sudoverse.Display
         private SudokuCellView[,] cells;
         private Line[] horizontalLines;
         private Line[] verticalLines;
-        private int selectedColumn, selectedRow;
+        private HashSet<(int, int)> selected;
+        private bool mouseDown;
+
+        public SharedFlag ShiftDown { get; }
+        public SharedFlag ControlDown { get; }
 
         public SudokuView(Sudoku sudoku) : base()
         {
@@ -37,19 +52,6 @@ namespace Sudoverse.Display
                     }
 
                     cells[column, row] = view;
-                    int fRow = row;
-                    int fColumn = column;
-                    view.Tapped += (s, e) =>
-                    {
-                        if (selectedRow >= 0 && selectedColumn >= 0)
-                        {
-                            cells[selectedColumn, selectedRow].Deselect();
-                        }
-
-                        view.Select();
-                        selectedColumn = fColumn;
-                        selectedRow = fRow;
-                    };
                     Children.Add(view);
                 }
             }
@@ -76,24 +78,135 @@ namespace Sudoverse.Display
                 Children.Add(verticalLine);
             }
 
-            selectedColumn = -1;
-            selectedRow = -1;
+            selected = new HashSet<(int, int)>();
+            var effect = new TouchEffect();
+            effect.TouchAction += OnTouchAction;
+            Effects.Add(effect);
+            mouseDown = false;
+            ShiftDown = new SharedFlag();
+            ControlDown = new SharedFlag();
+        }
+
+        private int FindCellCoordinate(double pointCoordinate, Func<int, double> lineCoordinateGetter)
+        {
+            int cellCoordinateMin = 0;
+            int cellCoordinateMax = Sudoku.Size;
+
+            while (cellCoordinateMin != cellCoordinateMax - 1)
+            {
+                int cellCoordinateMid = (cellCoordinateMin + cellCoordinateMax) / 2;
+
+                if (pointCoordinate >= lineCoordinateGetter(cellCoordinateMid))
+                    cellCoordinateMin = cellCoordinateMid;
+                else cellCoordinateMax = cellCoordinateMid;
+            }
+
+            return cellCoordinateMin;
+        }
+
+        private (int, int) FindCellCoordinates(Point location)
+        {
+            // Note: For some weird reason, using Left and Top instead of Center.X and Center.Y
+            // yields more accurate results when clicking on different sides of a line.
+
+            int column = FindCellCoordinate(location.X, i => verticalLines[i].Bounds.Left);
+            int row = FindCellCoordinate(location.Y, i => horizontalLines[i].Bounds.Top);
+
+            return (column, row);
+        }
+
+        private void OnMoved(int column, int row, SudokuCellView view, SelectMode selectMode)
+        {
+            switch (selectMode)
+            {
+                case SelectMode.Normal:
+                case SelectMode.Add:
+                    if (selected.Add((column, row)))
+                        view.Select();
+                    break;
+                case SelectMode.Remove:
+                    if (selected.Remove((column, row)))
+                        view.Deselect();
+                    break;
+            }
+        }
+
+        private void OnPressed(int column, int row, SudokuCellView view, SelectMode selectMode)
+        {
+            mouseDown = true;
+
+            switch (selectMode)
+            {
+                case SelectMode.Normal:
+                    foreach ((int selectedColumn, int selectedRow) in selected)
+                    {
+                        cells[selectedColumn, selectedRow].Deselect();
+                    }
+
+                    selected.Clear();
+                    goto case SelectMode.Add;
+                case SelectMode.Add:
+                    if (selected.Add((column, row)))
+                        view.Select();
+                    break;
+                case SelectMode.Remove:
+                    if (selected.Remove((column, row)))
+                        view.Deselect();
+                    break;
+            }
+        }
+
+        private void OnTouchAction(object sender, TouchActionEventArgs e)
+        {
+            if (e.Type == TouchActionType.Moved && !mouseDown)
+                return;
+
+            if (e.Type == TouchActionType.Entered || e.Type == TouchActionType.Cancelled)
+                return;
+
+            if (e.Type == TouchActionType.Exited || e.Type == TouchActionType.Released)
+            {
+                mouseDown = false;
+                return;
+            }
+
+            (int column, int row) = FindCellCoordinates(e.Location);
+            var view = cells[column, row];
+
+            if (view == null) return;
+
+            var selectMode = SelectMode.Normal;
+
+            if (ShiftDown) selectMode = SelectMode.Add;
+            else if (ControlDown) selectMode = SelectMode.Remove;
+
+            switch (e.Type)
+            {
+                case TouchActionType.Pressed:
+                    OnPressed(column, row, view, selectMode);
+                    break;
+                case TouchActionType.Moved:
+                    OnMoved(column, row, view, selectMode);
+                    break;
+            }
         }
 
         public void Enter(int digit)
         {
-            if (selectedColumn < 0 || selectedRow < 0) return;
-
-            if (cells[selectedColumn, selectedRow].Enter(digit))
-                Sudoku.SetCell(selectedColumn, selectedRow, digit);
+            foreach ((int column, int row) in selected)
+            {
+                if (cells[column, row].Enter(digit))
+                    Sudoku.SetCell(column, row, digit);
+            }
         }
 
         public void ClearCell()
         {
-            if (selectedColumn < 0 || selectedRow < 0) return;
-
-            if (cells[selectedColumn, selectedRow].Clear())
-                Sudoku.SetCell(selectedColumn, selectedRow, 0);
+            foreach ((int column, int row) in selected)
+            {
+                if (cells[column, row].Clear())
+                    Sudoku.SetCell(column, row, 0);
+            }
         }
 
         protected override void LayoutChildren(double x, double y, double width, double height)

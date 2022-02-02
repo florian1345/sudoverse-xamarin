@@ -16,7 +16,4 @@
                 VerticalTextAlignment="Center" />
         </AbsoluteLayout>
     </ContentView.Content>
-    <ContentView.GestureRecognizers>
-        <TapGestureRecognizer Tapped="OnTapped" />
-    </ContentView.GestureRecognizers>
 </ContentView>

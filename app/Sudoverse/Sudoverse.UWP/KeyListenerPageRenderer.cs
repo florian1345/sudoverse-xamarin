@@ -23,11 +23,13 @@ namespace Sudoverse.UWP
             Loaded += (sender, e) =>
             {
                 CoreWindow.GetForCurrentThread().KeyDown += OnKeyDown;
+                CoreWindow.GetForCurrentThread().KeyUp += OnKeyUp;
             };
 
             Unloaded += (sender, e) =>
             {
                 CoreWindow.GetForCurrentThread().KeyDown -= OnKeyDown;
+                CoreWindow.GetForCurrentThread().KeyUp -= OnKeyUp;
             };
         }
 
@@ -36,7 +38,15 @@ namespace Sudoverse.UWP
             var key = ToKey(e.VirtualKey);
 
             if (key != null)
-                (Element as KeyListenerPage).SendKeyPressed(sender, new KeyEventArgs((Key)key));
+                (Element as KeyListenerPage).SendKeyDown(sender, new KeyEventArgs((Key)key));
+        }
+
+        private void OnKeyUp(CoreWindow sender, WindowsKeyEventArgs e)
+        {
+            var key = ToKey(e.VirtualKey);
+
+            if (key != null)
+                (Element as KeyListenerPage).SendKeyUp(sender, new KeyEventArgs((Key)key));
         }
 
         private static Key? ToKey(VirtualKey vkey)
@@ -73,6 +83,14 @@ namespace Sudoverse.UWP
                 case VirtualKey.Back:
                 case VirtualKey.Delete:
                     return Key.Delete;
+                case VirtualKey.Shift:
+                case VirtualKey.LeftShift:
+                case VirtualKey.RightShift:
+                    return Key.Shift;
+                case VirtualKey.Control:
+                case VirtualKey.LeftControl:
+                case VirtualKey.RightControl:
+                    return Key.Control;
                 default: return null;
             }
         }
