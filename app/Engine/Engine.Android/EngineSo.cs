@@ -4,14 +4,15 @@ namespace Engine
 {
     public static class EngineSo
     {
-        // TODO figure out how to link different SOs depending on architecture
-
-        const string DllName = "Engine/lib/arm64-v8a/libengine.so";
+        const string DllName = "libengine.so";
 
         [DllImport(DllName, EntryPoint = "test")]
         public static extern int Test();
 
         [DllImport(DllName, EntryPoint = "gen_default")]
-        public static extern byte[] GenDefault();
+        public static extern string GenDefault();
+
+        [DllImport(DllName, EntryPoint = "check_default")]
+        public static extern bool CheckDefault(string json);
     }
 }
