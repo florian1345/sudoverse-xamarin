@@ -1,4 +1,5 @@
-﻿using Sudoverse.Touch;
+﻿using Sudoverse.SudokuModel;
+using Sudoverse.Touch;
 using Sudoverse.Util;
 using System;
 using System.Collections.Generic;
@@ -42,14 +43,10 @@ namespace Sudoverse.Display
             {
                 for (int column = 0; column < Sudoku.Size; column++)
                 {
-                    var view = new SudokuCellView();
-                    int cell = Sudoku.GetCell(column, row);
+                    var cell = Sudoku.GetCell(column, row);
+                    var view = new SudokuCellView(cell);
 
-                    if (cell > 0)
-                    {
-                        view.Enter(cell);
-                        view.Lock();
-                    }
+                    if (cell.Filled) view.Lock();
 
                     cells[column, row] = view;
                     Children.Add(view);
@@ -191,21 +188,21 @@ namespace Sudoverse.Display
             }
         }
 
-        public void Enter(int digit)
+        public void Enter(int digit, Notation notation)
         {
             foreach ((int column, int row) in selected)
             {
-                if (cells[column, row].Enter(digit))
-                    Sudoku.SetCell(column, row, digit);
+                if (!cells[column, row].Locked)
+                    Sudoku.EnterCell(column, row, digit, notation);
             }
         }
 
-        public void ClearCell()
+        public void ClearSelected()
         {
             foreach ((int column, int row) in selected)
             {
-                if (cells[column, row].Clear())
-                    Sudoku.SetCell(column, row, 0);
+                if (!cells[column, row].Locked)
+                    Sudoku.GetCell(column, row).Clear();
             }
         }
 
