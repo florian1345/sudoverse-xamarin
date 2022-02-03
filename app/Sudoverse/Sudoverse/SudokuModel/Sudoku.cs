@@ -67,7 +67,7 @@ namespace Sudoverse.SudokuModel
                 int cell = cells[i].Digit;
 
                 if (cell == 0) cellsJson.Add(JValue.CreateNull());
-                else cellsJson.Add(cells[i]);
+                else cellsJson.Add(cell);
             }
 
             var grid = new JObject();

@@ -4,51 +4,51 @@
              x:Class="Sudoverse.Display.SudokuCellView">
     <ContentView.Content>
         <AbsoluteLayout>
-            <BoxView Color="Transparent"
-                AbsoluteLayout.LayoutBounds="0.0,0.0,1,1"
+            <BoxView
+                Color="Transparent"
+                AbsoluteLayout.LayoutBounds="0,0,1,1"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="Background" />
-            <!-- These numbers look stupid, but somehow they align the labels rather well. -->
-            <Label Text=""
-                AbsoluteLayout.LayoutBounds="0.4,0.3,0.8,0.8"
+            <!-- These numbers look crazy, but they get a decent alignment -->
+            <Label
+                Text=""
+                AbsoluteLayout.LayoutBounds="0.45,0.325,0.8,0.8"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="LabelCenter"
+                FontFamily="DigitFont"
                 HorizontalTextAlignment="Center"
                 VerticalTextAlignment="Center"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill" />
-            <Label Text=""
-                AbsoluteLayout.LayoutBounds="0,0.025,0.25,0.25"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+            <Label
+                Text=""
+                AbsoluteLayout.LayoutBounds="0.05,-0.025,0.2,0.3"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="LabelTopLeft"
-                HorizontalTextAlignment="Center"
-                VerticalTextAlignment="Center"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill" />
-            <Label Text=""
-                AbsoluteLayout.LayoutBounds="0.95,0.025,0.25,0.25"
+                FontFamily="DigitFont"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+            <Label
+                Text=""
+                AbsoluteLayout.LayoutBounds="0.925,-0.025,0.2,0.3"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="LabelTopRight"
-                HorizontalTextAlignment="Center"
-                VerticalTextAlignment="Center"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill" />
-            <Label Text=""
-                AbsoluteLayout.LayoutBounds="0,0.875,0.25,0.25"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+            <Label
+                Text=""
+                AbsoluteLayout.LayoutBounds="0.05,0.875,0.2,0.3"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="LabelBottomLeft"
-                HorizontalTextAlignment="Center"
-                VerticalTextAlignment="Center"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill" />
-            <Label Text=""
-                AbsoluteLayout.LayoutBounds="0.95,0.875,0.25,0.25"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+            <Label
+                Text=""
+                AbsoluteLayout.LayoutBounds="0.925,0.875,0.2,0.3"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="LabelBottomRight"
-                HorizontalTextAlignment="Center"
-                VerticalTextAlignment="Center"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill" />
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
         </AbsoluteLayout>
     </ContentView.Content>
 </ContentView>

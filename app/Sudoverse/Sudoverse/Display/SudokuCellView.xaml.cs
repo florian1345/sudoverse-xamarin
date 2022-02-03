@@ -48,6 +48,9 @@ namespace Sudoverse.Display
             {
                 LabelCenter.FontSize = fontSize;
                 LabelCenter.Text = cell.Digit.ToString();
+
+                foreach (var label in cornerLabels)
+                    label.Text = "";
             }
             else
             {

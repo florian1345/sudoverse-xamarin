@@ -50,6 +50,12 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation = global::Sudoverse.Droid.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation;
 			global::Engine.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation = global::Sudoverse.Droid.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation;
 			global::Engine.Resource.Animation.fragment_fast_out_extra_slow_in = global::Sudoverse.Droid.Resource.Animation.fragment_fast_out_extra_slow_in;
+			global::Engine.Resource.Animator.fragment_close_enter = global::Sudoverse.Droid.Resource.Animator.fragment_close_enter;
+			global::Engine.Resource.Animator.fragment_close_exit = global::Sudoverse.Droid.Resource.Animator.fragment_close_exit;
+			global::Engine.Resource.Animator.fragment_fade_enter = global::Sudoverse.Droid.Resource.Animator.fragment_fade_enter;
+			global::Engine.Resource.Animator.fragment_fade_exit = global::Sudoverse.Droid.Resource.Animator.fragment_fade_exit;
+			global::Engine.Resource.Animator.fragment_open_enter = global::Sudoverse.Droid.Resource.Animator.fragment_open_enter;
+			global::Engine.Resource.Animator.fragment_open_exit = global::Sudoverse.Droid.Resource.Animator.fragment_open_exit;
 			global::Engine.Resource.Attribute.actionBarDivider = global::Sudoverse.Droid.Resource.Attribute.actionBarDivider;
 			global::Engine.Resource.Attribute.actionBarItemBackground = global::Sudoverse.Droid.Resource.Attribute.actionBarItemBackground;
 			global::Engine.Resource.Attribute.actionBarPopupTheme = global::Sudoverse.Droid.Resource.Attribute.actionBarPopupTheme;
@@ -68,6 +74,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Attribute.actionMenuTextColor = global::Sudoverse.Droid.Resource.Attribute.actionMenuTextColor;
 			global::Engine.Resource.Attribute.actionModeBackground = global::Sudoverse.Droid.Resource.Attribute.actionModeBackground;
 			global::Engine.Resource.Attribute.actionModeCloseButtonStyle = global::Sudoverse.Droid.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Engine.Resource.Attribute.actionModeCloseContentDescription = global::Sudoverse.Droid.Resource.Attribute.actionModeCloseContentDescription;
 			global::Engine.Resource.Attribute.actionModeCloseDrawable = global::Sudoverse.Droid.Resource.Attribute.actionModeCloseDrawable;
 			global::Engine.Resource.Attribute.actionModeCopyDrawable = global::Sudoverse.Droid.Resource.Attribute.actionModeCopyDrawable;
 			global::Engine.Resource.Attribute.actionModeCutDrawable = global::Sudoverse.Droid.Resource.Attribute.actionModeCutDrawable;
@@ -78,6 +85,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Attribute.actionModeShareDrawable = global::Sudoverse.Droid.Resource.Attribute.actionModeShareDrawable;
 			global::Engine.Resource.Attribute.actionModeSplitBackground = global::Sudoverse.Droid.Resource.Attribute.actionModeSplitBackground;
 			global::Engine.Resource.Attribute.actionModeStyle = global::Sudoverse.Droid.Resource.Attribute.actionModeStyle;
+			global::Engine.Resource.Attribute.actionModeTheme = global::Sudoverse.Droid.Resource.Attribute.actionModeTheme;
 			global::Engine.Resource.Attribute.actionModeWebSearchDrawable = global::Sudoverse.Droid.Resource.Attribute.actionModeWebSearchDrawable;
 			global::Engine.Resource.Attribute.actionOverflowButtonStyle = global::Sudoverse.Droid.Resource.Attribute.actionOverflowButtonStyle;
 			global::Engine.Resource.Attribute.actionOverflowMenuStyle = global::Sudoverse.Droid.Resource.Attribute.actionOverflowMenuStyle;
@@ -182,6 +190,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Attribute.fontProviderFetchTimeout = global::Sudoverse.Droid.Resource.Attribute.fontProviderFetchTimeout;
 			global::Engine.Resource.Attribute.fontProviderPackage = global::Sudoverse.Droid.Resource.Attribute.fontProviderPackage;
 			global::Engine.Resource.Attribute.fontProviderQuery = global::Sudoverse.Droid.Resource.Attribute.fontProviderQuery;
+			global::Engine.Resource.Attribute.fontProviderSystemFontFamily = global::Sudoverse.Droid.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Engine.Resource.Attribute.fontStyle = global::Sudoverse.Droid.Resource.Attribute.fontStyle;
 			global::Engine.Resource.Attribute.fontVariationSettings = global::Sudoverse.Droid.Resource.Attribute.fontVariationSettings;
 			global::Engine.Resource.Attribute.fontWeight = global::Sudoverse.Droid.Resource.Attribute.fontWeight;
@@ -227,6 +236,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Attribute.navigationContentDescription = global::Sudoverse.Droid.Resource.Attribute.navigationContentDescription;
 			global::Engine.Resource.Attribute.navigationIcon = global::Sudoverse.Droid.Resource.Attribute.navigationIcon;
 			global::Engine.Resource.Attribute.navigationMode = global::Sudoverse.Droid.Resource.Attribute.navigationMode;
+			global::Engine.Resource.Attribute.nestedScrollViewStyle = global::Sudoverse.Droid.Resource.Attribute.nestedScrollViewStyle;
 			global::Engine.Resource.Attribute.numericModifiers = global::Sudoverse.Droid.Resource.Attribute.numericModifiers;
 			global::Engine.Resource.Attribute.overlapAnchor = global::Sudoverse.Droid.Resource.Attribute.overlapAnchor;
 			global::Engine.Resource.Attribute.paddingBottomNoButtons = global::Sudoverse.Droid.Resource.Attribute.paddingBottomNoButtons;
@@ -244,6 +254,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Attribute.progressBarStyle = global::Sudoverse.Droid.Resource.Attribute.progressBarStyle;
 			global::Engine.Resource.Attribute.queryBackground = global::Sudoverse.Droid.Resource.Attribute.queryBackground;
 			global::Engine.Resource.Attribute.queryHint = global::Sudoverse.Droid.Resource.Attribute.queryHint;
+			global::Engine.Resource.Attribute.queryPatterns = global::Sudoverse.Droid.Resource.Attribute.queryPatterns;
 			global::Engine.Resource.Attribute.radioButtonStyle = global::Sudoverse.Droid.Resource.Attribute.radioButtonStyle;
 			global::Engine.Resource.Attribute.ratingBarStyle = global::Sudoverse.Droid.Resource.Attribute.ratingBarStyle;
 			global::Engine.Resource.Attribute.ratingBarStyleIndicator = global::Sudoverse.Droid.Resource.Attribute.ratingBarStyleIndicator;
@@ -254,6 +265,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Attribute.seekBarStyle = global::Sudoverse.Droid.Resource.Attribute.seekBarStyle;
 			global::Engine.Resource.Attribute.selectableItemBackground = global::Sudoverse.Droid.Resource.Attribute.selectableItemBackground;
 			global::Engine.Resource.Attribute.selectableItemBackgroundBorderless = global::Sudoverse.Droid.Resource.Attribute.selectableItemBackgroundBorderless;
+			global::Engine.Resource.Attribute.shortcutMatchRequired = global::Sudoverse.Droid.Resource.Attribute.shortcutMatchRequired;
 			global::Engine.Resource.Attribute.showAsAction = global::Sudoverse.Droid.Resource.Attribute.showAsAction;
 			global::Engine.Resource.Attribute.showDividers = global::Sudoverse.Droid.Resource.Attribute.showDividers;
 			global::Engine.Resource.Attribute.showText = global::Sudoverse.Droid.Resource.Attribute.showText;
@@ -477,6 +489,9 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Dimension.abc_seekbar_track_background_height_material = global::Sudoverse.Droid.Resource.Dimension.abc_seekbar_track_background_height_material;
 			global::Engine.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Sudoverse.Droid.Resource.Dimension.abc_seekbar_track_progress_height_material;
 			global::Engine.Resource.Dimension.abc_select_dialog_padding_start_material = global::Sudoverse.Droid.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Engine.Resource.Dimension.abc_star_big = global::Sudoverse.Droid.Resource.Dimension.abc_star_big;
+			global::Engine.Resource.Dimension.abc_star_medium = global::Sudoverse.Droid.Resource.Dimension.abc_star_medium;
+			global::Engine.Resource.Dimension.abc_star_small = global::Sudoverse.Droid.Resource.Dimension.abc_star_small;
 			global::Engine.Resource.Dimension.abc_switch_padding = global::Sudoverse.Droid.Resource.Dimension.abc_switch_padding;
 			global::Engine.Resource.Dimension.abc_text_size_body_1_material = global::Sudoverse.Droid.Resource.Dimension.abc_text_size_body_1_material;
 			global::Engine.Resource.Dimension.abc_text_size_body_2_material = global::Sudoverse.Droid.Resource.Dimension.abc_text_size_body_2_material;
@@ -599,6 +614,8 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Drawable.abc_seekbar_track_material = global::Sudoverse.Droid.Resource.Drawable.abc_seekbar_track_material;
 			global::Engine.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Sudoverse.Droid.Resource.Drawable.abc_spinner_mtrl_am_alpha;
 			global::Engine.Resource.Drawable.abc_spinner_textfield_background_material = global::Sudoverse.Droid.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Engine.Resource.Drawable.abc_star_black_48dp = global::Sudoverse.Droid.Resource.Drawable.abc_star_black_48dp;
+			global::Engine.Resource.Drawable.abc_star_half_black_48dp = global::Sudoverse.Droid.Resource.Drawable.abc_star_half_black_48dp;
 			global::Engine.Resource.Drawable.abc_switch_thumb_material = global::Sudoverse.Droid.Resource.Drawable.abc_switch_thumb_material;
 			global::Engine.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Sudoverse.Droid.Resource.Drawable.abc_switch_track_mtrl_alpha;
 			global::Engine.Resource.Drawable.abc_tab_indicator_material = global::Sudoverse.Droid.Resource.Drawable.abc_tab_indicator_material;
@@ -609,6 +626,9 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Sudoverse.Droid.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Engine.Resource.Drawable.abc_textfield_search_material = global::Sudoverse.Droid.Resource.Drawable.abc_textfield_search_material;
 			global::Engine.Resource.Drawable.abc_text_cursor_material = global::Sudoverse.Droid.Resource.Drawable.abc_text_cursor_material;
+			global::Engine.Resource.Drawable.abc_text_select_handle_left_mtrl = global::Sudoverse.Droid.Resource.Drawable.abc_text_select_handle_left_mtrl;
+			global::Engine.Resource.Drawable.abc_text_select_handle_middle_mtrl = global::Sudoverse.Droid.Resource.Drawable.abc_text_select_handle_middle_mtrl;
+			global::Engine.Resource.Drawable.abc_text_select_handle_right_mtrl = global::Sudoverse.Droid.Resource.Drawable.abc_text_select_handle_right_mtrl;
 			global::Engine.Resource.Drawable.abc_vector_test = global::Sudoverse.Droid.Resource.Drawable.abc_vector_test;
 			global::Engine.Resource.Drawable.btn_checkbox_checked_mtrl = global::Sudoverse.Droid.Resource.Drawable.btn_checkbox_checked_mtrl;
 			global::Engine.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Sudoverse.Droid.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
@@ -766,6 +786,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Id.showHome = global::Sudoverse.Droid.Resource.Id.showHome;
 			global::Engine.Resource.Id.showTitle = global::Sudoverse.Droid.Resource.Id.showTitle;
 			global::Engine.Resource.Id.spacer = global::Sudoverse.Droid.Resource.Id.spacer;
+			global::Engine.Resource.Id.special_effects_controller_view_tag = global::Sudoverse.Droid.Resource.Id.special_effects_controller_view_tag;
 			global::Engine.Resource.Id.split_action_bar = global::Sudoverse.Droid.Resource.Id.split_action_bar;
 			global::Engine.Resource.Id.src_atop = global::Sudoverse.Droid.Resource.Id.src_atop;
 			global::Engine.Resource.Id.src_in = global::Sudoverse.Droid.Resource.Id.src_in;
@@ -778,10 +799,15 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Id.tag_accessibility_clickable_spans = global::Sudoverse.Droid.Resource.Id.tag_accessibility_clickable_spans;
 			global::Engine.Resource.Id.tag_accessibility_heading = global::Sudoverse.Droid.Resource.Id.tag_accessibility_heading;
 			global::Engine.Resource.Id.tag_accessibility_pane_title = global::Sudoverse.Droid.Resource.Id.tag_accessibility_pane_title;
+			global::Engine.Resource.Id.tag_on_apply_window_listener = global::Sudoverse.Droid.Resource.Id.tag_on_apply_window_listener;
+			global::Engine.Resource.Id.tag_on_receive_content_listener = global::Sudoverse.Droid.Resource.Id.tag_on_receive_content_listener;
+			global::Engine.Resource.Id.tag_on_receive_content_mime_types = global::Sudoverse.Droid.Resource.Id.tag_on_receive_content_mime_types;
 			global::Engine.Resource.Id.tag_screen_reader_focusable = global::Sudoverse.Droid.Resource.Id.tag_screen_reader_focusable;
+			global::Engine.Resource.Id.tag_state_description = global::Sudoverse.Droid.Resource.Id.tag_state_description;
 			global::Engine.Resource.Id.tag_transition_group = global::Sudoverse.Droid.Resource.Id.tag_transition_group;
 			global::Engine.Resource.Id.tag_unhandled_key_event_manager = global::Sudoverse.Droid.Resource.Id.tag_unhandled_key_event_manager;
 			global::Engine.Resource.Id.tag_unhandled_key_listeners = global::Sudoverse.Droid.Resource.Id.tag_unhandled_key_listeners;
+			global::Engine.Resource.Id.tag_window_insets_animation_callback = global::Sudoverse.Droid.Resource.Id.tag_window_insets_animation_callback;
 			global::Engine.Resource.Id.text = global::Sudoverse.Droid.Resource.Id.text;
 			global::Engine.Resource.Id.text2 = global::Sudoverse.Droid.Resource.Id.text2;
 			global::Engine.Resource.Id.textSpacerNoButtons = global::Sudoverse.Droid.Resource.Id.textSpacerNoButtons;
@@ -796,7 +822,9 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Id.uniform = global::Sudoverse.Droid.Resource.Id.uniform;
 			global::Engine.Resource.Id.up = global::Sudoverse.Droid.Resource.Id.up;
 			global::Engine.Resource.Id.useLogo = global::Sudoverse.Droid.Resource.Id.useLogo;
+			global::Engine.Resource.Id.view_tree_lifecycle_owner = global::Sudoverse.Droid.Resource.Id.view_tree_lifecycle_owner;
 			global::Engine.Resource.Id.view_tree_saved_state_registry_owner = global::Sudoverse.Droid.Resource.Id.view_tree_saved_state_registry_owner;
+			global::Engine.Resource.Id.view_tree_view_model_store_owner = global::Sudoverse.Droid.Resource.Id.view_tree_view_model_store_owner;
 			global::Engine.Resource.Id.visible_removing_fragment_view_tag = global::Sudoverse.Droid.Resource.Id.visible_removing_fragment_view_tag;
 			global::Engine.Resource.Id.withText = global::Sudoverse.Droid.Resource.Id.withText;
 			global::Engine.Resource.Id.wrap_content = global::Sudoverse.Droid.Resource.Id.wrap_content;
@@ -1359,6 +1387,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeBackground;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Engine.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
@@ -1369,6 +1398,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Engine.Resource.Styleable.AppCompatTheme_actionModeTheme = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeTheme;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
 			global::Engine.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
@@ -1469,6 +1499,9 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Styleable.AppCompatTheme_windowNoTitle = global::Sudoverse.Droid.Resource.Styleable.AppCompatTheme_windowNoTitle;
 			global::Engine.Resource.Styleable.ButtonBarLayout = global::Sudoverse.Droid.Resource.Styleable.ButtonBarLayout;
 			global::Engine.Resource.Styleable.ButtonBarLayout_allowStacking = global::Sudoverse.Droid.Resource.Styleable.ButtonBarLayout_allowStacking;
+			global::Engine.Resource.Styleable.Capability = global::Sudoverse.Droid.Resource.Styleable.Capability;
+			global::Engine.Resource.Styleable.Capability_queryPatterns = global::Sudoverse.Droid.Resource.Styleable.Capability_queryPatterns;
+			global::Engine.Resource.Styleable.Capability_shortcutMatchRequired = global::Sudoverse.Droid.Resource.Styleable.Capability_shortcutMatchRequired;
 			global::Engine.Resource.Styleable.ColorStateListItem = global::Sudoverse.Droid.Resource.Styleable.ColorStateListItem;
 			global::Engine.Resource.Styleable.ColorStateListItem_alpha = global::Sudoverse.Droid.Resource.Styleable.ColorStateListItem_alpha;
 			global::Engine.Resource.Styleable.ColorStateListItem_android_alpha = global::Sudoverse.Droid.Resource.Styleable.ColorStateListItem_android_alpha;
@@ -1507,6 +1540,7 @@ namespace Sudoverse.Droid
 			global::Engine.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Sudoverse.Droid.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Engine.Resource.Styleable.FontFamily_fontProviderPackage = global::Sudoverse.Droid.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Engine.Resource.Styleable.FontFamily_fontProviderQuery = global::Sudoverse.Droid.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Engine.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Sudoverse.Droid.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Engine.Resource.Styleable.Fragment = global::Sudoverse.Droid.Resource.Styleable.Fragment;
 			global::Engine.Resource.Styleable.FragmentContainerView = global::Sudoverse.Droid.Resource.Styleable.FragmentContainerView;
 			global::Engine.Resource.Styleable.FragmentContainerView_android_name = global::Sudoverse.Droid.Resource.Styleable.FragmentContainerView_android_name;
@@ -18299,52 +18333,61 @@ namespace Sudoverse.Droid
 			public const int navigation_empty_icon = 2131165311;
 			
 			// aapt resource value: 0x7F070080
-			public const int notification_action_background = 2131165312;
+			public const int notation_corner = 2131165312;
 			
 			// aapt resource value: 0x7F070081
-			public const int notification_bg = 2131165313;
+			public const int notation_normal = 2131165313;
 			
 			// aapt resource value: 0x7F070082
-			public const int notification_bg_low = 2131165314;
+			public const int notation_small = 2131165314;
 			
 			// aapt resource value: 0x7F070083
-			public const int notification_bg_low_normal = 2131165315;
+			public const int notification_action_background = 2131165315;
 			
 			// aapt resource value: 0x7F070084
-			public const int notification_bg_low_pressed = 2131165316;
+			public const int notification_bg = 2131165316;
 			
 			// aapt resource value: 0x7F070085
-			public const int notification_bg_normal = 2131165317;
+			public const int notification_bg_low = 2131165317;
 			
 			// aapt resource value: 0x7F070086
-			public const int notification_bg_normal_pressed = 2131165318;
+			public const int notification_bg_low_normal = 2131165318;
 			
 			// aapt resource value: 0x7F070087
-			public const int notification_icon_background = 2131165319;
+			public const int notification_bg_low_pressed = 2131165319;
 			
 			// aapt resource value: 0x7F070088
-			public const int notification_template_icon_bg = 2131165320;
+			public const int notification_bg_normal = 2131165320;
 			
 			// aapt resource value: 0x7F070089
-			public const int notification_template_icon_low_bg = 2131165321;
+			public const int notification_bg_normal_pressed = 2131165321;
 			
 			// aapt resource value: 0x7F07008A
-			public const int notification_tile_bg = 2131165322;
+			public const int notification_icon_background = 2131165322;
 			
 			// aapt resource value: 0x7F07008B
-			public const int notify_panel_notification_icon_bg = 2131165323;
+			public const int notification_template_icon_bg = 2131165323;
 			
 			// aapt resource value: 0x7F07008C
-			public const int preference_list_divider_material = 2131165324;
+			public const int notification_template_icon_low_bg = 2131165324;
 			
 			// aapt resource value: 0x7F07008D
-			public const int test_custom_background = 2131165325;
+			public const int notification_tile_bg = 2131165325;
 			
 			// aapt resource value: 0x7F07008E
-			public const int tooltip_frame_dark = 2131165326;
+			public const int notify_panel_notification_icon_bg = 2131165326;
 			
 			// aapt resource value: 0x7F07008F
-			public const int tooltip_frame_light = 2131165327;
+			public const int preference_list_divider_material = 2131165327;
+			
+			// aapt resource value: 0x7F070090
+			public const int test_custom_background = 2131165328;
+			
+			// aapt resource value: 0x7F070091
+			public const int tooltip_frame_dark = 2131165329;
+			
+			// aapt resource value: 0x7F070092
+			public const int tooltip_frame_light = 2131165330;
 			
 			static Drawable()
 			{

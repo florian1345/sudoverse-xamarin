@@ -1,7 +1,6 @@
-﻿using System;
-using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
+﻿using Xamarin.Forms;
 
+[assembly: ExportFont("OpenSans-Regular.ttf", Alias = "DigitFont")]
 namespace Sudoverse
 {
     public partial class App : Application
