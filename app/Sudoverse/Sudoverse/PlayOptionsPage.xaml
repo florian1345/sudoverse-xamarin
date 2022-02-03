@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:display="clr-namespace:Sudoverse.Display;assembly=Sudoverse"
+             x:Class="Sudoverse.PlayOptionsPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label
+                Text="Select Options"
+                FontSize="Large"
+                VerticalOptions="EndAndExpand" 
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center" />
+            <StackLayout
+                    Orientation="Horizontal"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center">
+                <Label
+                    Text="Difficulty"
+                    FontSize="Medium"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    MaxLines="1" />
+                <display:DifficultySlider
+                    x:Name="DifficultySlider"
+                    VerticalOptions="Fill"
+                    HorizontalOptions="Fill"
+                    HeightRequest="50" />
+            </StackLayout>
+            <StackLayout
+                    Orientation="Horizontal"
+                    VerticalOptions="StartAndExpand" 
+                    HorizontalOptions="CenterAndExpand">
+                <Button
+                    Text="Back"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center"
+                    Clicked="OnBack" />
+                <Button
+                    Text="Start"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center"
+                    Clicked="OnStart" />
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

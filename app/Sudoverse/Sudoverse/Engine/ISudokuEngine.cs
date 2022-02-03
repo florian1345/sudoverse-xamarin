@@ -4,7 +4,7 @@
     {
         int Test();
 
-        string GenDefault();
+        string GenDefault(int difficulty);
 
         bool CheckDefault(string json);
     }

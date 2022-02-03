@@ -116,6 +116,8 @@
     <Content Include="Assets\Images\notation_corner.png" />
     <Content Include="Assets\Images\notation_normal.png" />
     <Content Include="Assets\Images\notation_small.png" />
+    <Content Include="Assets\Images\star_off.png" />
+    <Content Include="Assets\Images\star_on.png" />
     <Content Include="Assets\LargeTile.scale-100.png" />
     <Content Include="Assets\LargeTile.scale-200.png" />
     <Content Include="Assets\LargeTile.scale-400.png" />

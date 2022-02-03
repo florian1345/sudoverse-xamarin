@@ -8,8 +8,8 @@ namespace Sudoverse.Droid
         public bool CheckDefault(string json) =>
             EngineSo.CheckDefault(json);
 
-        public string GenDefault() =>
-            EngineSo.GenDefault();
+        public string GenDefault(int difficulty) =>
+            EngineSo.GenDefault(difficulty);
 
         public int Test() =>
             EngineSo.Test();

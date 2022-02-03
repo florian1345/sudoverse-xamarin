@@ -47,9 +47,7 @@ namespace Sudoverse
 
 		private void OnPlay(object sender, EventArgs e)
 		{
-			string json = SudokuEngineProvider.Engine.GenDefault();
-			Sudoku sudoku = Sudoku.ParseJson<StatelessConstraint>(json);
-			App.Current.MainPage = new PlayPage(sudoku);
+			App.Current.MainPage = new PlayOptionsPage();
 		}
 	}
 }
