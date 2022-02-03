@@ -1,6 +1,7 @@
 ﻿using Sudoverse.Display;
 using Sudoverse.Engine;
 using Sudoverse.SudokuModel;
+using Sudoverse.Util;
 using System;
 using Xamarin.Forms;
 
@@ -11,8 +12,12 @@ namespace Sudoverse
 		private static readonly Color NotationButtonSelectedBackground = Color.Gray;
 		private static readonly Color NotationButtonUnselectedBackground = Color.LightGray;
 
+		private const int UNDO_CAPACITY = 255;
+
 		private Notation notation;
 		private SudokuView sudokuView;
+		private DropOutStack<Operation> undos;
+		private DropOutStack<Operation> redos;
 
 		public PlayPage(Sudoku sudoku)
 		{
@@ -25,6 +30,9 @@ namespace Sudoverse
 			ButtonNotationNormal.BorderColor = NotationButtonSelectedBackground;
 			ButtonNotationSmall.BorderColor = NotationButtonUnselectedBackground;
 			ButtonNotationCorner.BorderColor = NotationButtonUnselectedBackground;
+
+			undos = new DropOutStack<Operation>(UNDO_CAPACITY);
+			redos = new DropOutStack<Operation>(UNDO_CAPACITY);
 		}
 
 		private void UpdateNotationButton(ImageButton button, bool selected)
@@ -42,9 +50,23 @@ namespace Sudoverse
 			UpdateNotationButton(ButtonNotationCorner, notation == Notation.Corner);
 		}
 
+		private void PushUndo(Operation operation)
+		{
+			if (!operation.IsNop())
+			{
+				undos.Push(operation);
+				redos.Clear();
+			}
+		}
+
 		private void Enter(int digit)
         {
-			sudokuView.Enter(digit, notation);
+			PushUndo(sudokuView.Enter(digit, notation));
+		}
+
+		private void Clear()
+		{
+			PushUndo(sudokuView.ClearSelected());
 		}
 
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -78,8 +100,14 @@ namespace Sudoverse
 				case Key.Digit9:
 					Enter(9);
 					break;
+				case Key.Y:
+					if (sudokuView.ControlDown) Redo();
+					break;
+				case Key.Z:
+					if (sudokuView.ControlDown) Undo();
+					break;
 				case Key.Delete:
-					sudokuView.ClearSelected();
+					Clear();
 					break;
 				case Key.Shift:
 					sudokuView.ShiftDown.Set();
@@ -150,7 +178,7 @@ namespace Sudoverse
 
 		private void OnClear(object sender, EventArgs e)
 		{
-			sudokuView.ClearSelected();
+			Clear();
 		}
 
 		private void OnCheck(object sender, EventArgs e)
@@ -192,5 +220,27 @@ namespace Sudoverse
 		{
 			SetNotation(Notation.Corner);
 		}
+
+		private void Undo()
+        {
+			if (!undos.Empty)
+				redos.Push(undos.Pop().Apply(sudokuView.Sudoku));
+        }
+
+		private void Redo()
+		{
+			if (!redos.Empty)
+				undos.Push(redos.Pop().Apply(sudokuView.Sudoku));
+		}
+
+		private void OnUndo(object sender, EventArgs e)
+        {
+			Undo();
+        }
+
+		private void OnRedo(object sender, EventArgs e)
+        {
+			Redo();
+        }
 	}
 }

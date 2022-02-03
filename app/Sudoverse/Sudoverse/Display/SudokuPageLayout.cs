@@ -11,7 +11,7 @@ namespace Sudoverse.Display
     /// opposite side along the shorter axis (i.e. as a row on the bottom in a vertical view and as
     /// a column on the right in a horizontal view).
     /// </summary>
-    public class SudokuPageLayout : Layout<View>
+    public sealed class SudokuPageLayout : Layout<View>
     {
         private const double FONT_SIZE_FACTOR = 0.05;
         private const double SUDOKU_SIZE_FACTOR = 0.67;

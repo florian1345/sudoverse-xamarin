@@ -5,7 +5,7 @@ namespace Sudoverse.Util
     /// <summary>
     /// A thread-safe boolean flag.
     /// </summary>
-    internal sealed class SharedFlag
+    public sealed class SharedFlag
     {
         private int flag;
 

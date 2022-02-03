@@ -117,12 +117,28 @@
                 Grid.ColumnSpan="2" />
 
             <Button
+                Text="⤺"
+                FontAttributes="Bold"
+                Clicked="OnUndo"
+                HorizontalOptions="Fill"
+                Grid.Row="3"
+                Grid.Column="2" />
+
+            <Button
+                Text="⤻"
+                FontAttributes="Bold"
+                Clicked="OnRedo"
+                HorizontalOptions="Fill"
+                Grid.Row="3"
+                Grid.Column="3" />
+
+            <Button
                 Text="Check"
                 FontAttributes="Bold"
                 Clicked="OnCheck"
                 HorizontalOptions="Fill"
-                Grid.Row="3"
-                Grid.Column="2"
+                Grid.Row="4"
+                Grid.Column="0"
                 Grid.ColumnSpan="2" />
 
             <Button
@@ -131,7 +147,7 @@
                 Clicked="OnBack"
                 HorizontalOptions="Fill"
                 Grid.Row="4"
-                Grid.Column="0"
+                Grid.Column="2"
                 Grid.ColumnSpan="2" />
         </Grid>
     </layouts:SudokuPageLayout>
