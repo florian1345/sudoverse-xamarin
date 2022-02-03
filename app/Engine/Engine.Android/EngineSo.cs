@@ -10,7 +10,7 @@ namespace Engine
         public static extern int Test();
 
         [DllImport(DllName, EntryPoint = "gen_default")]
-        public static extern string GenDefault();
+        public static extern string GenDefault(int difficulty);
 
         [DllImport(DllName, EntryPoint = "check_default")]
         public static extern bool CheckDefault(string json);

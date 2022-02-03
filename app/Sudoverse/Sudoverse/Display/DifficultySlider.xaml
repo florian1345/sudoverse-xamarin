@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Sudoverse.Display"
+             x:Class="Sudoverse.Display.DifficultySlider">
+    <ContentView.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <controls:DifficultySliderStar x:Name="Star1" Grid.Column="0" >
+                <controls:DifficultySliderStar.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStar1Tapped" />
+                </controls:DifficultySliderStar.GestureRecognizers>
+            </controls:DifficultySliderStar>
+            <controls:DifficultySliderStar x:Name="Star2" Grid.Column="1" >
+                <controls:DifficultySliderStar.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStar2Tapped" />
+                </controls:DifficultySliderStar.GestureRecognizers>
+            </controls:DifficultySliderStar>
+            <controls:DifficultySliderStar x:Name="Star3" Grid.Column="2" >
+                <controls:DifficultySliderStar.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStar3Tapped" />
+                </controls:DifficultySliderStar.GestureRecognizers>
+            </controls:DifficultySliderStar>
+            <controls:DifficultySliderStar x:Name="Star4" Grid.Column="3" >
+                <controls:DifficultySliderStar.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStar4Tapped" />
+                </controls:DifficultySliderStar.GestureRecognizers>
+            </controls:DifficultySliderStar>
+            <controls:DifficultySliderStar x:Name="Star5" Grid.Column="4" >
+                <controls:DifficultySliderStar.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStar5Tapped" />
+                </controls:DifficultySliderStar.GestureRecognizers>
+            </controls:DifficultySliderStar>
+        </Grid>
+    </ContentView.Content>
+</ContentView>
