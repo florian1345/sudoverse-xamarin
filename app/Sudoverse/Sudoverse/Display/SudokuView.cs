@@ -3,12 +3,13 @@ using Sudoverse.Touch;
 using Sudoverse.Util;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xamarin.Forms;
 using Xamarin.Forms.Shapes;
 
 namespace Sudoverse.Display
 {
-    internal sealed class SudokuView : Layout<View>
+    public sealed class SudokuView : Layout<View>
     {
         private enum SelectMode
         {
@@ -188,23 +189,43 @@ namespace Sudoverse.Display
             }
         }
 
-        public void Enter(int digit, Notation notation)
+        private Operation ApplyToSelected(Func<int, int, Operation> operation)
         {
+            var reverseStack = new Stack<Operation>();
+
             foreach ((int column, int row) in selected)
             {
                 if (!cells[column, row].Locked)
-                    Sudoku.EnterCell(column, row, digit, notation);
+                {
+                    var reverse = operation(column, row);
+
+                    if (!reverse.IsNop())
+                        reverseStack.Push(reverse);
+                }
+            }
+
+            if (reverseStack.Count == 0)
+                return new NoOperation();
+            else if (reverseStack.Count == 1)
+                return reverseStack.Pop();
+            else
+            {
+                var reverseArray = new Operation[reverseStack.Count];
+
+                for (int i = 0; i < reverseArray.Length; i++)
+                {
+                    reverseArray[i] = reverseStack.Pop();
+                }
+
+                return new CompositeOperation(reverseArray);
             }
         }
 
-        public void ClearSelected()
-        {
-            foreach ((int column, int row) in selected)
-            {
-                if (!cells[column, row].Locked)
-                    Sudoku.GetCell(column, row).Clear();
-            }
-        }
+        public Operation Enter(int digit, Notation notation) =>
+            ApplyToSelected((column, row) => Sudoku.EnterCell(column, row, digit, notation));
+
+        public Operation ClearSelected() =>
+            ApplyToSelected((column, row) => Sudoku.ClearCell(column, row));
 
         protected override void LayoutChildren(double x, double y, double width, double height)
         {

@@ -73,32 +73,47 @@ namespace Sudoverse.SudokuModel
         }
 
         /// <summary>
-        /// Enters a big digit to the cell. For clearing, use <see cref="Clear"/> instead.
+        /// Enters a big digit to the cell. For clearing, use <see cref="Clear"/> instead. Returns
+        /// true if changed.
         /// </summary>
-        public void EnterNormal(int digit)
+        public bool EnterNormal(int digit)
         {
             if (Digit != digit)
             {
                 Digit = digit;
                 Updated?.Invoke(this, new EventArgs());
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
         /// <summary>
         /// Toggles a small digit to the corners of this cell. If there are already four different
-        /// digits in the corners, the highest one is removed.
+        /// digits in the corners, nothing is changed. True is returned if something changed.
         /// </summary>
-        public void ToggleCorner(int digit)
+        public bool ToggleCorner(int digit)
         {
             if (cornerDigits.Add(digit))
             {
                 if (cornerDigits.Count > 4)
-                    cornerDigits.Remove(cornerDigits.Max);
+                {
+                    cornerDigits.Remove(digit);
+                    return false;
+                }
 
                 Updated?.Invoke(this, new EventArgs());
+                return true;
             }
             else if (cornerDigits.Remove(digit))
+            {
                 Updated?.Invoke(this, new EventArgs());
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

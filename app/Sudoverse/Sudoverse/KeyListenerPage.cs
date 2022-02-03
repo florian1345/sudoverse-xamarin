@@ -57,6 +57,16 @@ namespace Sudoverse
         Digit9,
 
         /// <summary>
+        /// The "Y" key (redo).
+        /// </summary>
+        Y,
+
+        /// <summary>
+        /// The "Z" key (undo).
+        /// </summary>
+        Z,
+
+        /// <summary>
         /// The "Backspace" or "Delete" key.
         /// </summary>
         Delete,

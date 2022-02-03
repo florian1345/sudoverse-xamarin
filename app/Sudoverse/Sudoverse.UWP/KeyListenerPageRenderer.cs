@@ -80,6 +80,10 @@ namespace Sudoverse.UWP
                 case VirtualKey.Number9:
                 case VirtualKey.NumberPad9:
                     return Key.Digit9;
+                case VirtualKey.Y:
+                    return Key.Y;
+                case VirtualKey.Z:
+                    return Key.Z;
                 case VirtualKey.Back:
                 case VirtualKey.Delete:
                     return Key.Delete;

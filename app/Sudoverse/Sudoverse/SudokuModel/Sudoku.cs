@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Sudoverse.Constraint;
 using System;
+using System.Linq;
 
 namespace Sudoverse.SudokuModel
 {
@@ -40,21 +41,63 @@ namespace Sudoverse.SudokuModel
         public SudokuCell GetCell(int column, int row) =>
             cells[row * Size + column];
 
-        public void EnterCell(int column, int row, int digit, Notation notation)
+        /// <summary>
+        /// Enters the given digit at the given location using the given notation. Small and corner
+        /// digits are ignored if a normal digit is present. The inverse operation is returned (may
+        /// be nop).
+        /// </summary>
+        public Operation EnterCell(int column, int row, int digit, Notation notation)
         {
             var cell = cells[row * Size + column];
 
             switch (notation)
             {
                 case Notation.Normal:
-                    cell.EnterNormal(digit);
+                    if (digit != cell.Digit)
+                    {
+                        int oldDigit = cell.Digit;
+                        cell.EnterNormal(digit);
+                        return new EnterOperation(column, row, oldDigit, notation);
+                    }
+
                     break;
                 case Notation.Small:
-                    if (!cell.Filled) cell.ToggleSmall(digit);
+                    if (!cell.Filled)
+                    {
+                        cell.ToggleSmall(digit);
+                        return new EnterOperation(column, row, digit, notation);
+                    }
+
                     break;
                 case Notation.Corner:
-                    if (!cell.Filled) cell.ToggleCorner(digit);
+                    if (!cell.Filled && cell.ToggleCorner(digit))
+                        return new EnterOperation(column, row, digit, notation);
+
                     break;
+            }
+
+            return new NoOperation();
+        }
+
+        public Operation ClearCell(int column, int row)
+        {
+            var cell = GetCell(column, row);
+
+            if (cell.Filled)
+            {
+                var digit = cell.Digit;
+                cell.Clear();
+                return new EnterOperation(column, row, digit, Notation.Normal);
+            }
+            else
+            {
+                var inverseOperations = cell.SmallDigits
+                    .Select(d => new EnterOperation(column, row, d, Notation.Small))
+                    .Concat(cell.CornerDigits
+                        .Select(d => new EnterOperation(column, row, d, Notation.Corner)))
+                    .ToArray();
+                cell.Clear();
+                return new CompositeOperation(inverseOperations);
             }
         }
 
