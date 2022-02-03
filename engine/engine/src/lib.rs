@@ -2,10 +2,11 @@
 //! libraries must fulfill as a standard rust crate. Other creates in this
 //! workspace re-export this as a static or dynamic library.
 
+use crate::sync::CancelHandle;
+
 use std::ffi::{CStr, CString};
 use std::mem;
 use std::os::raw::c_char;
-use std::sync::{Arc, RwLock};
 use std::sync::mpsc::{self, Sender};
 use std::thread;
 
@@ -22,8 +23,12 @@ use sudoku_variants::solver::strategy::{
     OnlyCellStrategy,
     StrategicBacktrackingSolver,
     StrategicSolver,
+    Strategy,
+    SudokuInfo,
     TupleStrategy
 };
+
+mod sync;
 
 /// A dummy solver which always returns `Solution::Amibguous`. This is used as
 /// a lower bound for the easiest difficulty to prevent special cases.
@@ -52,46 +57,74 @@ impl Solver for DummyPerfectSolver {
     }
 }
 
-fn difficulty_0() -> impl Solver {
+struct CancellableStrategy<S> {
+    strategy: S,
+    handle: CancelHandle
+}
+
+impl<S> CancellableStrategy<S> {
+    fn new(strategy: S, handle: CancelHandle) -> CancellableStrategy<S> {
+        CancellableStrategy {
+            strategy,
+            handle
+        }
+    }
+}
+
+impl<S: Strategy> Strategy for CancellableStrategy<S> {
+    fn apply<C>(&self, sudoku_info: &mut SudokuInfo<C>) -> bool
+    where
+        C: Constraint + Clone + 'static
+    {
+        self.handle.assert_not_cancelled();
+        self.strategy.apply(sudoku_info)
+    }
+}
+
+fn difficulty_0(_: CancelHandle) -> impl Solver {
     NotSolver
 }
 
-fn difficulty_inf() -> impl Solver {
+fn difficulty_inf(_: CancelHandle) -> impl Solver {
     DummyPerfectSolver
 }
 
-fn default_difficulty_1() -> impl Solver {
+fn default_difficulty_1(_: CancelHandle) -> impl Solver {
     StrategicSolver::new(OnlyCellStrategy)
 }
 
-fn default_difficulty_2() -> impl Solver {
+fn default_difficulty_2(handle: CancelHandle) -> impl Solver {
     StrategicSolver::new(
-        CompositeStrategy::new(
+        CancellableStrategy::new(
             CompositeStrategy::new(
-                OnlyCellStrategy,
-                NakedSingleStrategy
-            ),
-            BoundedCellsBacktrackingStrategy::new(|_| 2, |_| Some(0), NoStrategy)
+                CompositeStrategy::new(
+                    OnlyCellStrategy,
+                    NakedSingleStrategy
+                ),
+                BoundedCellsBacktrackingStrategy::new(|_| 2, |_| Some(0), NoStrategy)
+            ), handle
         )
     )
 }
 
-fn default_difficulty_3() -> impl Solver {
-    StrategicSolver::new(CompositeStrategy::new(
+fn default_difficulty_3(handle: CancelHandle) -> impl Solver {
+    StrategicSolver::new(CancellableStrategy::new(CompositeStrategy::new(
         CompositeStrategy::new(
             OnlyCellStrategy,
             NakedSingleStrategy
         ),
         CompositeStrategy::new(
             BoundedCellsBacktrackingStrategy::new(|_| 2, |_| Some(1),
-                BoundedCellsBacktrackingStrategy::new(|_| 2, |_| Some(0), NoStrategy)),
+                CancellableStrategy::new(
+                    BoundedCellsBacktrackingStrategy::new(|_| 2, |_| Some(0), NoStrategy),
+                    handle.clone())),
             TupleStrategy::new(|_| 2)
         )
-    ))
+    ), handle))
 }
 
-fn default_difficulty_4() -> impl Solver {
-    StrategicSolver::new(
+fn default_difficulty_4(handle: CancelHandle) -> impl Solver {
+    StrategicSolver::new(CancellableStrategy::new(
         CompositeStrategy::new(
             CompositeStrategy::new(
                 OnlyCellStrategy,
@@ -100,7 +133,10 @@ fn default_difficulty_4() -> impl Solver {
             CompositeStrategy::new(
                 CompositeStrategy::new(
                     BoundedCellsBacktrackingStrategy::new(|_| 2, |_| Some(1),
-                        BoundedCellsBacktrackingStrategy::new(|_| 2, |_| Some(0), NoStrategy)),
+                        CancellableStrategy::new(
+                            BoundedCellsBacktrackingStrategy::new(|_| 2, |_| Some(0), NoStrategy),
+                            handle.clone())
+                        ),
                     TupleStrategy::new(|_| 3)
                 ),
                 CompositeStrategy::new(
@@ -118,11 +154,11 @@ fn default_difficulty_4() -> impl Solver {
                     )
                 )
             )
-        )
+        ), handle)
     )
 }
 
-fn default_difficulty_5() -> impl Solver {
+fn default_difficulty_5(_: CancelHandle) -> impl Solver {
     StrategicBacktrackingSolver::new(
         CompositeStrategy::new(
             OnlyCellStrategy,
@@ -146,7 +182,7 @@ where
 fn gen_with_difficulty_thread<SL, SU, SG, C, FC>(
     lower_difficulty_bound_solver: SL,
     upper_difficulty_bound_solver: SU, generator_solver: SG,
-    constraint_cons: FC, shall_continue: Arc<RwLock<bool>>,
+    constraint_cons: FC, cancel_handle: CancelHandle,
     result_sender: Sender<Sudoku<C>>)
 where
     SL: Solver,
@@ -158,7 +194,7 @@ where
     let mut generator = Generator::new_default();
     let mut reducer = Reducer::new(generator_solver, rand::thread_rng());
 
-    while *shall_continue.read().unwrap() {
+    while !cancel_handle.is_cancelled() {
         let constraint = constraint_cons();
         let mut sudoku = generator.generate(3, 3, constraint).unwrap();
         reducer.reduce(&mut sudoku);
@@ -200,42 +236,41 @@ fn gen_with_difficulty<SL, FSL, SU, FSU, SG, FSG, C, FC>(
     constraint_cons: FC) -> Sudoku<C>
 where
     SL: Solver + Send + 'static,
-    FSL: Fn() -> SL,
+    FSL: Fn(CancelHandle) -> SL,
     SU: Solver + Send + 'static,
-    FSU: Fn() -> SU,
+    FSU: Fn(CancelHandle) -> SU,
     SG: Solver + Send + 'static,
-    FSG: Fn() -> SG,
+    FSG: Fn(CancelHandle) -> SG,
     C: Constraint + Clone + Send + 'static,
     FC: Fn() -> C + Send + Copy + 'static
 {
     // TODO replace with thread::available_parallelism once stable
     let threads = num_cpus::get();
-    let shall_continue = Arc::new(RwLock::new(true));
-    //let mut join_handles = Vec::new();
+    let mut cancel_handles = Vec::new();
     let (sender, receiver) = mpsc::channel();
 
     for _ in 0..threads {
-        let shall_continue = Arc::clone(&shall_continue);
+        let cancel_handle = CancelHandle::new();
+        cancel_handles.push(cancel_handle.clone());
         let result_sender = Sender::clone(&sender);
-        let lower_difficulty_bound_solver = lower_difficulty_bound_solver_cons();
-        let upper_difficulty_bound_solver = upper_difficulty_bound_solver_cons();
-        let generator_solver = generator_solver_cons();
+        let lower_difficulty_bound_solver =
+            lower_difficulty_bound_solver_cons(cancel_handle.clone());
+        let upper_difficulty_bound_solver =
+            upper_difficulty_bound_solver_cons(cancel_handle.clone());
+        let generator_solver = generator_solver_cons(cancel_handle.clone());
         thread::spawn(move || gen_with_difficulty_thread(
             lower_difficulty_bound_solver,
             upper_difficulty_bound_solver, generator_solver,
-            constraint_cons, shall_continue, result_sender));
+            constraint_cons, cancel_handle, result_sender));
     }
 
     drop(sender);
 
     let result = receiver.recv().unwrap();
-    let mut flag_guard = shall_continue.write().unwrap();
-    *flag_guard = true;
-    drop(flag_guard);
 
-    /*for join_handle in join_handles {
-        join_handle.join().unwrap();
-    }*/
+    for cancel_handle in cancel_handles {
+        cancel_handle.cancel();
+    }
 
     result
 }
