@@ -4,7 +4,9 @@
              xmlns:display="clr-namespace:Sudoverse.Display;assembly=Sudoverse"
              x:Class="Sudoverse.PlayOptionsPage">
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout
+                Spacing="20"
+                Margin="50,0,50,0" >
             <Label
                 Text="Select Options"
                 FontSize="Large"
@@ -27,6 +29,9 @@
                     HorizontalOptions="Fill"
                     HeightRequest="50" />
             </StackLayout>
+            <ScrollView VerticalOptions="FillAndExpand">
+                <StackLayout x:Name="RuleList" />
+            </ScrollView>
             <StackLayout
                     Orientation="Horizontal"
                     VerticalOptions="StartAndExpand" 

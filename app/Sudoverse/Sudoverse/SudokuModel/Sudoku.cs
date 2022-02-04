@@ -146,7 +146,7 @@ namespace Sudoverse.SudokuModel
             throw new ParseSudokuException();
         }
 
-        internal static Sudoku ParseJson<C>(string json)
+        public static Sudoku ParseJson<C>(string json)
             where C : IConstraint, new()
         {
             var sudokuToken = JToken.Parse(json);

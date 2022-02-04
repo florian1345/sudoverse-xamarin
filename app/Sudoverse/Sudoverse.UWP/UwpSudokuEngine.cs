@@ -8,10 +8,10 @@ namespace Sudoverse.UWP
         public int Test() =>
             EngineDll.Test();
 
-        public string GenDefault(int difficulty) =>
-            EngineDll.GenDefault(difficulty);
+        public string Gen(int constraint, int difficulty) =>
+            EngineDll.Gen(constraint, difficulty);
 
-        public bool CheckDefault(string json) =>
-            EngineDll.CheckDefault(json);
+        public bool Check(int constraint, string json) =>
+            EngineDll.Check(constraint, json) > 0;
     }
 }

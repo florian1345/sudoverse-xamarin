@@ -1,8 +1,18 @@
 //! This is the common engine crate. It defines all functionality the engine
 //! libraries must fulfill as a standard rust crate. Other creates in this
 //! workspace re-export this as a static or dynamic library.
+//!
+//! Different constraints are referred to with unique identifiers. Currently,
+//! valid values are
+//!
+//! * `0` for classic Sudoku
+//! * `1` for diagonals Sudoku
+//! * `2` for knight's move Sudoku
+//! * `3` for king's move Sudoku
 
 use crate::sync::CancelHandle;
+
+use serde::{Deserialize, Serialize};
 
 use std::ffi::{CStr, CString};
 use std::mem;
@@ -11,7 +21,14 @@ use std::sync::mpsc::{self, Sender};
 use std::thread;
 
 use sudoku_variants::{Sudoku, SudokuGrid};
-use sudoku_variants::constraint::{Constraint, DefaultConstraint};
+use sudoku_variants::constraint::{
+    CompositeConstraint,
+    Constraint,
+    DefaultConstraint,
+    DiagonallyAdjacentConstraint,
+    DiagonalsConstraint,
+    KnightsMoveConstraint
+};
 use sudoku_variants::generator::{Generator, Reducer};
 use sudoku_variants::solver::{Solution, Solver};
 use sudoku_variants::solver::strategy::{
@@ -167,8 +184,36 @@ fn default_difficulty_5(_: CancelHandle) -> impl Solver {
     )
 }
 
+type DefaultDiagonalsConstraint =
+    CompositeConstraint<DefaultConstraint, DiagonalsConstraint>;
+type DefaultKnightsMoveConstraint =
+    CompositeConstraint<DefaultConstraint, KnightsMoveConstraint>;
+type DefaultKingsMoveConstraint =
+    CompositeConstraint<DefaultConstraint, DiagonallyAdjacentConstraint>;
+
 fn default_constraint() -> DefaultConstraint {
     DefaultConstraint
+}
+
+fn diagonals_constraint() -> DefaultDiagonalsConstraint {
+    CompositeConstraint::new(
+        DefaultConstraint,
+        DiagonalsConstraint
+    )
+}
+
+fn knights_move_constraint() -> DefaultKnightsMoveConstraint {
+    CompositeConstraint::new(
+        DefaultConstraint,
+        KnightsMoveConstraint
+    )
+}
+
+fn kings_move_constraint() -> DefaultKingsMoveConstraint {
+    CompositeConstraint::new(
+        DefaultConstraint,
+        DiagonallyAdjacentConstraint
+    )
 }
 
 fn can_solve<C, S>(sudoku: &Sudoku<C>, solver: &S) -> bool
@@ -275,36 +320,37 @@ where
     result
 }
 
-/// Generates a 9x9 Sudoku with a default constraint and returns its CBOR
-/// serialization.
-#[no_mangle]
-pub extern fn gen_default(difficulty: i32) -> *const c_char {
+fn gen_simple<C, FC>(difficulty: i32, constraint_cons: FC) -> *const c_char
+where
+    C: Constraint + Clone + Send + Serialize + 'static,
+    FC: Fn() -> C + Send + Copy + 'static
+{
     let sudoku = match difficulty {
         1 => gen_with_difficulty(
             difficulty_0,
             default_difficulty_1,
             default_difficulty_1,
-            default_constraint),
+            constraint_cons),
         2 => gen_with_difficulty(
             default_difficulty_1,
             default_difficulty_2,
             default_difficulty_2,
-            default_constraint),
+            constraint_cons),
         3 => gen_with_difficulty(
             default_difficulty_2,
             default_difficulty_3,
             default_difficulty_5,
-            default_constraint),
+            constraint_cons),
         4 => gen_with_difficulty(
             default_difficulty_3,
             default_difficulty_4,
             default_difficulty_5,
-            default_constraint),
+            constraint_cons),
         5 => gen_with_difficulty(
             default_difficulty_4,
             difficulty_inf,
             default_difficulty_5,
-            default_constraint),
+            constraint_cons),
         _ => panic!("Invalid difficulty: {}", difficulty)
     };
 
@@ -315,14 +361,53 @@ pub extern fn gen_default(difficulty: i32) -> *const c_char {
     json_ptr
 }
 
-/// Checks whether all constraints in a 9x9 Sudoku with a default constraint
-/// are satisfied.
+/// Generates a 9x9 Sudoku with the provided constraint and difficulty and
+/// returns its JSON serialization.
+///
+/// # Arguments
+///
+/// * `constraint`: A identifier for the constraint that is used. For valid
+/// values, please refer to the crate-level documentation.
+/// * `difficulty`: The difficulty of the generated Sudoku on a scale from 1 to
+/// 5 (both inclusive).
 #[no_mangle]
-pub extern fn check_default(json: *const c_char) -> bool {
+pub extern fn gen(constraint: i32, difficulty: i32) -> *const c_char {
+    match constraint {
+        0 => gen_simple(difficulty, default_constraint),
+        1 => gen_simple(difficulty, diagonals_constraint),
+        2 => gen_simple(difficulty, knights_move_constraint),
+        3 => gen_simple(difficulty, kings_move_constraint),
+        _ => panic!("Invalid constraint identifier: {}", constraint)
+    }
+}
+
+fn check_with<C>(json: *const c_char) -> u8
+where
+    C: Constraint + Clone,
+    for<'de> C: Deserialize<'de>
+{
     let json = unsafe { CStr::from_ptr(json) }.to_str().unwrap();
-    let sudoku: Sudoku<DefaultConstraint> =
-        serde_json::from_str(json).unwrap();
-    sudoku.is_valid()
+    let sudoku: Sudoku<C> = serde_json::from_str(json).unwrap();
+
+    if sudoku.is_valid() { 1 } else { 0 }
+}
+
+/// Checks whether all constraints in a 9x9 Sudoku with the given constraint
+/// types are satisfied.
+///
+/// # Arguments
+///
+/// * `constraint`: A identifier for the constraint that is used. For valid
+/// values, please refer to the crate-level documentation.
+#[no_mangle]
+pub extern fn check(constraint: i32, json: *const c_char) -> u8 {
+    match constraint {
+        0 => check_with::<DefaultConstraint>(json),
+        1 => check_with::<DefaultDiagonalsConstraint>(json),
+        2 => check_with::<DefaultKnightsMoveConstraint>(json),
+        3 => check_with::<DefaultKingsMoveConstraint>(json),
+        _ => panic!("Invalid constraint identifier: {}", constraint)
+    }
 }
 
 /// Returns 42. For tests that the library was loaded correctly.

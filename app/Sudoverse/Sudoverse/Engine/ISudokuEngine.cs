@@ -4,8 +4,8 @@
     {
         int Test();
 
-        string GenDefault(int difficulty);
+        string Gen(int constraint, int difficulty);
 
-        bool CheckDefault(string json);
+        bool Check(int constraint, string json);
     }
 }

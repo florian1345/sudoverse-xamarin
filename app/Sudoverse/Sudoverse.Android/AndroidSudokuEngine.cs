@@ -5,11 +5,11 @@ namespace Sudoverse.Droid
 {
     internal sealed class AndroidSudokuEngine : ISudokuEngine
     {
-        public bool CheckDefault(string json) =>
-            EngineSo.CheckDefault(json);
+        public bool Check(int constraint, string json) =>
+            EngineSo.Check(constraint, json) > 0;
 
-        public string GenDefault(int difficulty) =>
-            EngineSo.GenDefault(difficulty);
+        public string Gen(int constraint, int difficulty) =>
+            EngineSo.Gen(constraint, difficulty);
 
         public int Test() =>
             EngineSo.Test();
