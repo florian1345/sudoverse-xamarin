@@ -28,7 +28,10 @@ namespace Sudoverse.Constraint
 
         public JToken ToJson()
         {
-            throw new NotImplementedException();
+            JObject jobject = new JObject();
+            jobject.Add("c1", c1.ToJson());
+            jobject.Add("c2", c2.ToJson());
+            return jobject;
         }
 
         public void FromJson(JToken token)

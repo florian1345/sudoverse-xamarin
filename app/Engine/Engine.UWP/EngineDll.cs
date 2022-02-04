@@ -13,10 +13,10 @@ namespace Engine
         [DllImport(DllName, EntryPoint = "test")]
         public static extern int Test();
 
-        [DllImport(DllName, EntryPoint = "gen_default")]
-        public static extern string GenDefault(int difficulty);
+        [DllImport(DllName, EntryPoint = "gen")]
+        public static extern string Gen(int constraint, int difficulty);
 
-        [DllImport(DllName, EntryPoint = "check_default")]
-        public static extern bool CheckDefault(string json);
+        [DllImport(DllName, EntryPoint = "check")]
+        public static extern byte Check(int constraint, string json);
     }
 }
