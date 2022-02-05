@@ -20,6 +20,11 @@ namespace Sudoverse.Display
         private SudokuCell cell;
         private Label[] cornerLabels;
 
+        /// <summary>
+        /// Gets the current big digit entered in this cell, or 0 if it is empty.
+        /// </summary>
+        public int Digit => cell.Digit;
+
         public SudokuCellView(SudokuCell cell)
         {
             InitializeComponent();
