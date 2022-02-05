@@ -6,6 +6,6 @@
 
         string Gen(int constraint, int difficulty);
 
-        bool Check(int constraint, string json);
+        bool Check(string json);
     }
 }

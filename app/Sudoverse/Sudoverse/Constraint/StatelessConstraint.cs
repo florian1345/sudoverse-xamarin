@@ -10,7 +10,12 @@ namespace Sudoverse.Constraint
     /// </summary>
     internal sealed class StatelessConstraint : IConstraint
     {
-        public StatelessConstraint() { }
+        public string Type { get; }
+
+        public StatelessConstraint(string type)
+        {
+            Type = type;
+        }
 
         public View[] GetBackgroundViews(ReadOnlyMatrix<ReadOnlyRect> fieldBounds) =>
             new View[0];
@@ -18,13 +23,7 @@ namespace Sudoverse.Constraint
         public Frame GetFrame() =>
             Frame.Empty();
 
-        public JToken ToJson() =>
-            JValue.CreateNull();
-
-        public void FromJson(JToken token)
-        {
-            if (token.Type != JTokenType.Null)
-                throw new LoadConstraintException();
-        }
+        public JToken ToJsonValue() =>
+            null;
     }
 }

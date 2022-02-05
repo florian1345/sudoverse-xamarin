@@ -6,7 +6,7 @@
     <ContentPage.Content>
         <StackLayout
                 Spacing="20"
-                Margin="50,0,50,0" >
+                Margin="20,0,20,0" >
             <Label
                 Text="Select Options"
                 FontSize="Large"

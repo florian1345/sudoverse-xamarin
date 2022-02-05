@@ -12,7 +12,8 @@
 
 use crate::sync::CancelHandle;
 
-use serde::{Deserialize, Serialize};
+use constraint::AnyConstraint;
+use serde::Serialize;
 
 use std::ffi::{CStr, CString};
 use std::mem;
@@ -45,6 +46,7 @@ use sudoku_variants::solver::strategy::{
     TupleStrategy
 };
 
+mod constraint;
 mod sync;
 
 /// A dummy solver which always returns `Solution::Amibguous`. This is used as
@@ -322,7 +324,7 @@ where
 
 fn gen_simple<C, FC>(difficulty: i32, constraint_cons: FC) -> *const c_char
 where
-    C: Constraint + Clone + Send + Serialize + 'static,
+    C: Constraint + Clone + Into<AnyConstraint> + Send + Serialize + 'static,
     FC: Fn() -> C + Send + Copy + 'static
 {
     let sudoku = match difficulty {
@@ -353,6 +355,9 @@ where
             constraint_cons),
         _ => panic!("Invalid difficulty: {}", difficulty)
     };
+    let (grid, constraint) = sudoku.into_raw_parts();
+    let constraint: AnyConstraint = constraint.into();
+    let sudoku = Sudoku::new_with_grid(grid, constraint);
 
     let json = serde_json::to_string(&sudoku).unwrap();
     let json_c = CString::new(json).unwrap();
@@ -381,17 +386,6 @@ pub extern fn gen(constraint: i32, difficulty: i32) -> *const c_char {
     }
 }
 
-fn check_with<C>(json: *const c_char) -> u8
-where
-    C: Constraint + Clone,
-    for<'de> C: Deserialize<'de>
-{
-    let json = unsafe { CStr::from_ptr(json) }.to_str().unwrap();
-    let sudoku: Sudoku<C> = serde_json::from_str(json).unwrap();
-
-    if sudoku.is_valid() { 1 } else { 0 }
-}
-
 /// Checks whether all constraints in a 9x9 Sudoku with the given constraint
 /// types are satisfied.
 ///
@@ -400,14 +394,11 @@ where
 /// * `constraint`: A identifier for the constraint that is used. For valid
 /// values, please refer to the crate-level documentation.
 #[no_mangle]
-pub extern fn check(constraint: i32, json: *const c_char) -> u8 {
-    match constraint {
-        0 => check_with::<DefaultConstraint>(json),
-        1 => check_with::<DefaultDiagonalsConstraint>(json),
-        2 => check_with::<DefaultKnightsMoveConstraint>(json),
-        3 => check_with::<DefaultKingsMoveConstraint>(json),
-        _ => panic!("Invalid constraint identifier: {}", constraint)
-    }
+pub extern fn check(json: *const c_char) -> u8 {
+    let json = unsafe { CStr::from_ptr(json) }.to_str().unwrap();
+    let sudoku: Sudoku<AnyConstraint> = serde_json::from_str(json).unwrap();
+
+    if sudoku.is_valid() { 1 } else { 0 }
 }
 
 /// Returns 42. For tests that the library was loaded correctly.

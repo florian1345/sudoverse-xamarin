@@ -14,8 +14,58 @@ namespace Sudoverse.Constraint
             : base("Invalid JSON data for constraint.") { }
     }
 
+    public static class ConstraintUtil
+    {
+        public static IConstraint FromJson(JToken jtoken)
+        {
+            if (!(jtoken is JObject jobject))
+                throw new LoadConstraintException();
+
+            if (!jobject.TryGetValue("type", out JToken typeToken))
+                throw new LoadConstraintException();
+
+            if (typeToken.Type != JTokenType.String)
+                throw new LoadConstraintException();
+
+            var type = (string)typeToken;
+
+            switch (type)
+            {
+                case "default":
+                case "diagonals":
+                case "knights-move":
+                case "kings-move":
+                    return new StatelessConstraint(type);
+                case "composite":
+                    if (!jobject.TryGetValue("value", out JToken valueToken))
+                        throw new LoadConstraintException();
+
+                    return CompositeConstraint.FromJsonValue(valueToken);
+            }
+
+            throw new LoadConstraintException();
+        }
+
+        public static JToken ToJson(IConstraint constraint)
+        {
+            var jobject = new JObject();
+            jobject.Add("type", constraint.Type);
+            var value = constraint.ToJsonValue();
+
+            if (value != null)
+                jobject.Add("value", value);
+
+            return jobject;
+        }
+    }
+
     public interface IConstraint
     {
+        /// <summary>
+        /// The textual type identifier of this constraint.
+        /// </summary>
+        string Type { get; }
+
         /// <summary>
         /// Gets the <see cref="Frame"/> that shall surround the Sudoku with additional information
         /// about this constraint. Use <see cref="Frame.Empty"/> if you do not need such a frame.
@@ -33,18 +83,8 @@ namespace Sudoverse.Constraint
 
         /// <summary>
         /// Converts this constraint to a <see cref="JToken"/> representing its data. For stateless
-        /// constraint, use <see cref="JValue.CreateNull"/>. Loading this in the same type using
-        /// <see cref="FromJson(JToken)"/> must yield an equivalent result.
+        /// constraint, return <tt>null</tt>.
         /// </summary>
-        JToken ToJson();
-
-        /// <summary>
-        /// Loads the parameters of this constraint from JSON data. Converting it back into JSON
-        /// using <see cref="ToJson"/> must yield an equivalent <see cref="JToken"/>.
-        /// </summary>
-        /// <param name="token">The JSON token holding the data to load.</param>
-        /// <exception cref="LoadConstraintException">If the JSON data does not represent a
-        /// constraint of this type.</exception>
-        void FromJson(JToken token);
+        JToken ToJsonValue();
     }
 }
