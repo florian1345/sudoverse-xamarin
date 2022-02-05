@@ -46,6 +46,8 @@ namespace Sudoverse.Display
                 {
                     var cell = Sudoku.GetCell(column, row);
                     var view = new SudokuCellView(cell);
+                    int fcolumn = column;
+                    int frow = row;
                     cells[column, row] = view;
                     Children.Add(view);
                 }
@@ -126,6 +128,24 @@ namespace Sudoverse.Display
             }
         }
 
+        private void OnDoublePressed(SudokuCellView view)
+        {
+            int digit = view.Digit;
+
+            if (digit == 0) return;
+
+            for (int row = 0; row < Sudoku.Size; row++)
+            {
+                for (int column = 0; column < Sudoku.Size; column++)
+                {
+                    var cellView = cells[column, row];
+
+                    if (cellView.Digit == digit && selected.Add((column, row)))
+                        cellView.Select();
+                }
+            }
+        }
+
         private void OnPressed(int column, int row, SudokuCellView view, SelectMode selectMode)
         {
             mouseDown = true;
@@ -133,6 +153,12 @@ namespace Sudoverse.Display
             switch (selectMode)
             {
                 case SelectMode.Normal:
+                    if (selected.Count == 1 && selected.Contains((column, row)))
+                    {
+                        OnDoublePressed(view);
+                        return;
+                    }
+
                     foreach ((int selectedColumn, int selectedRow) in selected)
                     {
                         cells[selectedColumn, selectedRow].Deselect();
