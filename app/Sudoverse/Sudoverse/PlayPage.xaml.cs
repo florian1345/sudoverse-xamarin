@@ -14,17 +14,15 @@ namespace Sudoverse
 
 		private const int UNDO_CAPACITY = 255;
 
-		private int constraintId;
 		private Notation notation;
 		private SudokuView sudokuView;
 		private DropOutStack<Operation> undos;
 		private DropOutStack<Operation> redos;
 
-		public PlayPage(Sudoku sudoku, int constraintId)
+		public PlayPage(Sudoku sudoku)
 		{
 			InitializeComponent();
 			sudokuView = new SudokuView(sudoku);
-			this.constraintId = constraintId;
 			Layout.Children.Insert(0, sudokuView);
             KeyDown += OnKeyDown;
 			KeyUp += OnKeyUp;
@@ -187,7 +185,7 @@ namespace Sudoverse
 		{
 			string json = sudokuView.Sudoku.ToJson();
 			
-			if (SudokuEngineProvider.Engine.Check(constraintId, json))
+			if (SudokuEngineProvider.Engine.Check(json))
             {
 				DisplayAlert("Check", "Correct.", "Ok");
             }

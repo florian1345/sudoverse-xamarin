@@ -11,7 +11,7 @@ namespace Sudoverse.UWP
         public string Gen(int constraint, int difficulty) =>
             EngineDll.Gen(constraint, difficulty);
 
-        public bool Check(int constraint, string json) =>
-            EngineDll.Check(constraint, json) > 0;
+        public bool Check(string json) =>
+            EngineDll.Check(json) > 0;
     }
 }

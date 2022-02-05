@@ -18,16 +18,14 @@ namespace Sudoverse
             public string ImageSource { get; }
             public string Title { get; }
             public string Description { get; }
-            public Type ConstraintType { get; }
             public int ConstraintId { get; }
 
             public RuleConfig(string imageSource, string title, string description,
-                Type constraintType, int constraintId)
+                int constraintId)
             {
                 ImageSource = imageSource;
                 Title = title;
                 Description = description;
-                ConstraintType = constraintType;
                 ConstraintId = constraintId;
             }
         }
@@ -35,21 +33,20 @@ namespace Sudoverse
         private static readonly RuleConfig[] RuleConfigs =
         {
             new RuleConfig("rules_classic.png", "Classic Sudoku",
-                "Each digit must appear exactly once in every row, column, and box.",
-                typeof(StatelessConstraint), 0),
+                "Each digit must appear exactly once in every row, column, and box.", 0),
             new RuleConfig("rules_diagonal.png", "Diagonals Sudoku",
                 "In addition to classic rules, each digit must appear exactly once on both diagonals.",
-                typeof(CompositeConstraint<StatelessConstraint, StatelessConstraint>), 1),
+                1),
             new RuleConfig("rules_knights_move.png", "Knight's Move Sudoku",
                 "In addition to classic rules, cells removed by a Chess knight's move must not contain the same digit.",
-                typeof(CompositeConstraint<StatelessConstraint, StatelessConstraint>), 2),
+                2),
             new RuleConfig("rules_kings_move.png", "King's Move Sudoku",
                 "In addition to classic rules, diagonally adjacent cells must not contain the same digit.",
-                typeof(CompositeConstraint<StatelessConstraint, StatelessConstraint>), 3)
+                3)
         };
 
         // TODO find a more dynamic solution
-        private const double CONSTRAINT_SELECTOR_HEIGHT_REQUEST = 160;
+        private const double CONSTRAINT_SELECTOR_HEIGHT_REQUEST = 128;
 
         private RuleConfig selectedRuleConfig;
         private ConstraintSelector selectedConstraintSelector;
@@ -100,15 +97,8 @@ namespace Sudoverse
         {
             int difficulty = DifficultySlider.Difficulty;
             string json = SudokuEngineProvider.Engine.Gen(selectedRuleConfig.ConstraintId, difficulty);
-            var method = typeof(Sudoku).GetMethod("ParseJson");
-            var genericMethod = method.MakeGenericMethod(selectedRuleConfig.ConstraintType);
-            var sudoku = (Sudoku)genericMethod.Invoke(null, new object[] { json });
-
-            /*Sudoku sudoku = (Sudoku)typeof(Sudoku).GetMethod("ParseJson")
-                .MakeGenericMethod(selectedRuleConfig.ConstraintType)
-                .Invoke(null, new object[] { json });*/
-
-            App.Current.MainPage = new PlayPage(sudoku, selectedRuleConfig.ConstraintId);
+            var sudoku = Sudoku.ParseJson(json);
+            App.Current.MainPage = new PlayPage(sudoku);
         }
     }
 }

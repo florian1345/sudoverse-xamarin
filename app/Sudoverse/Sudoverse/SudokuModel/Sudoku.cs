@@ -120,7 +120,7 @@ namespace Sudoverse.SudokuModel
 
             var sudoku = new JObject();
             sudoku.Add("grid", grid);
-            sudoku.Add("constraint", Constraint.ToJson());
+            sudoku.Add("constraint", ConstraintUtil.ToJson(Constraint));
             return JsonConvert.SerializeObject(sudoku);
         }
 
@@ -146,18 +146,21 @@ namespace Sudoverse.SudokuModel
             throw new ParseSudokuException();
         }
 
-        public static Sudoku ParseJson<C>(string json)
-            where C : IConstraint, new()
+        public static Sudoku ParseJson(string json)
         {
             var sudokuToken = JToken.Parse(json);
 
             if (!(sudokuToken is JObject sudokuObject))
                 throw new ParseSudokuException();
 
+            if (!sudokuObject.TryGetValue("constraint", out JToken constraintToken))
+                throw new ParseSudokuException();
+
+            var constraint = ConstraintUtil.FromJson(constraintToken);
             var grid = GetField<JObject>(sudokuObject, "grid");
             int blockWidth = ToInt(GetField<JValue>(grid, "block_width"));
             int blockHeight = ToInt(GetField<JValue>(grid, "block_height"));
-            Sudoku result = new Sudoku(blockWidth, blockHeight, new C());
+            Sudoku result = new Sudoku(blockWidth, blockHeight, constraint);
             var jsonCells = GetField<JArray>(grid, "cells");
 
             SudokuCell[] cells = new SudokuCell[jsonCells.Count];
@@ -171,11 +174,6 @@ namespace Sudoverse.SudokuModel
                 throw new ParseSudokuException();
 
             result.cells = cells;
-
-            if (!sudokuObject.TryGetValue("constraint", out JToken constraintToken))
-                throw new ParseSudokuException();
-
-            result.Constraint.FromJson(constraintToken);
             return result;
         }
     }

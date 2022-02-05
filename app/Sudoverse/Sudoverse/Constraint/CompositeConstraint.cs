@@ -1,51 +1,56 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sudoverse.Util;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xamarin.Forms;
 
 namespace Sudoverse.Constraint
 {
-    internal sealed class CompositeConstraint<C1, C2> : IConstraint
-        where C1 : IConstraint, new()
-        where C2 : IConstraint, new()
+    internal sealed class CompositeConstraint : IConstraint
     {
-        private C1 c1;
-        private C2 c2;
+        private List<IConstraint> constraints;
 
-        public CompositeConstraint()
+        public string Type => "composite";
+
+        private CompositeConstraint(List<IConstraint> constraints)
         {
-            c1 = new C1();
-            c2 = new C2();
+            this.constraints = constraints;
         }
 
-        public View[] GetBackgroundViews(ReadOnlyMatrix<ReadOnlyRect> fieldBounds) =>
-            c1.GetBackgroundViews(fieldBounds).Concat(c2.GetBackgroundViews(fieldBounds));
+        public View[] GetBackgroundViews(ReadOnlyMatrix<ReadOnlyRect> fieldBounds)
+        {
+            var result = Enumerable.Empty<View>();
+
+            foreach (var constraint in constraints)
+                result = result.Concat(constraint.GetBackgroundViews(fieldBounds));
+
+            return result.ToArray();
+        }
 
         public Frame GetFrame()
         {
             throw new NotImplementedException();
         }
 
-        public JToken ToJson()
+        public JToken ToJsonValue()
         {
-            JObject jobject = new JObject();
-            jobject.Add("c1", c1.ToJson());
-            jobject.Add("c2", c2.ToJson());
-            return jobject;
+            JArray jarray = new JArray();
+
+            foreach (var constraint in constraints)
+                jarray.Add(ConstraintUtil.ToJson(constraint));
+
+            return jarray;
         }
 
-        public void FromJson(JToken token)
+        public static IConstraint FromJsonValue(JToken token)
         {
-            if (!(token is JObject jobject))
+            if (token.Type != JTokenType.Array)
                 throw new LoadConstraintException();
 
-            if (jobject.TryGetValue("c1", out JToken tc1))
-                c1.FromJson(tc1);
-            else throw new LoadConstraintException();
-
-            if (jobject.TryGetValue("c2", out JToken tc2))
-                c2.FromJson(tc2);
-            else throw new LoadConstraintException();
+            var constraints = ((JArray)token).Select(t => ConstraintUtil.FromJson(t))
+                .ToList();
+            return new CompositeConstraint(constraints);
         }
     }
 }
