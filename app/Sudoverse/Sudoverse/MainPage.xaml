@@ -7,12 +7,13 @@
         <Grid RowSpacing="25" RowDefinitions="Auto,Auto,Auto,Auto,*"
               Padding="{OnPlatform iOS='30,60,30,30', Default='30'}">
 
-            <!--
-            <Image Grid.Row="0"
-                Source="logo.png"
-                WidthRequest="250"
-                HeightRequest="310"
-                HorizontalOptions="Center" />-->
+            <Button
+                x:Name="ButtonContinue"
+                Text="Continue"
+                FontAttributes="Bold"
+                Grid.Row="0"
+                Clicked="OnContinue"
+                HorizontalOptions="Center" />
 
             <Button
                 x:Name="ButtonPlay"

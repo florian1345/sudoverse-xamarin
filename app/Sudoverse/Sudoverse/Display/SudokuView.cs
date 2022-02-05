@@ -46,9 +46,6 @@ namespace Sudoverse.Display
                 {
                     var cell = Sudoku.GetCell(column, row);
                     var view = new SudokuCellView(cell);
-
-                    if (cell.Filled) view.Lock();
-
                     cells[column, row] = view;
                     Children.Add(view);
                 }
@@ -195,13 +192,10 @@ namespace Sudoverse.Display
 
             foreach ((int column, int row) in selected)
             {
-                if (!cells[column, row].Locked)
-                {
-                    var reverse = operation(column, row);
+                var reverse = operation(column, row);
 
-                    if (!reverse.IsNop())
-                        reverseStack.Push(reverse);
-                }
+                if (!reverse.IsNop())
+                    reverseStack.Push(reverse);
             }
 
             if (reverseStack.Count == 0)

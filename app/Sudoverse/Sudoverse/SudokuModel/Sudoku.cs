@@ -6,18 +6,17 @@ using System.Linq;
 
 namespace Sudoverse.SudokuModel
 {
-    public sealed class ParseSudokuException : Exception
-    {
-        public ParseSudokuException()
-            : base("Invalid JSON data for Sudoku.") { }
-    }
-
     public sealed class Sudoku
     {
         public int BlockWidth { get; private set; }
         public int BlockHeight { get; private set; }
         public int Size { get; private set; }
         public IConstraint Constraint { get; private set; }
+
+        /// <summary>
+        /// Indicates whether this Sudoku is full, i.e. all cells contain a big digit.
+        /// </summary>
+        public bool Full => cells.All(c => c.Filled);
 
         private SudokuCell[] cells;
 
@@ -56,17 +55,19 @@ namespace Sudoverse.SudokuModel
                     if (digit != cell.Digit)
                     {
                         int oldDigit = cell.Digit;
-                        cell.EnterNormal(digit);
-                        return new EnterOperation(column, row, oldDigit, notation);
+
+                        if (cell.EnterNormal(digit))
+                        {
+                            if (oldDigit == 0)
+                                return new ClearOperation(column, row);
+                            else return new EnterOperation(column, row, oldDigit, notation);
+                        }
                     }
 
                     break;
                 case Notation.Small:
-                    if (!cell.Filled)
-                    {
-                        cell.ToggleSmall(digit);
+                    if (!cell.Filled && cell.ToggleSmall(digit))
                         return new EnterOperation(column, row, digit, notation);
-                    }
 
                     break;
                 case Notation.Corner:
@@ -86,7 +87,7 @@ namespace Sudoverse.SudokuModel
             if (cell.Filled)
             {
                 var digit = cell.Digit;
-                cell.Clear();
+                if (!cell.Clear()) return new NoOperation();
                 return new EnterOperation(column, row, digit, Notation.Normal);
             }
             else
@@ -101,16 +102,13 @@ namespace Sudoverse.SudokuModel
             }
         }
 
-        public string ToJson()
+        private string ToJsonWith(Func<SudokuCell, JToken> cellConverter)
         {
             var cellsJson = new JArray();
 
-            for (int i = 0; i < cells.Length; i++)
+            foreach (var cell in cells)
             {
-                int cell = cells[i].Digit;
-
-                if (cell == 0) cellsJson.Add(JValue.CreateNull());
-                else cellsJson.Add(cell);
+                cellsJson.Add(cellConverter(cell));
             }
 
             var grid = new JObject();
@@ -124,29 +122,30 @@ namespace Sudoverse.SudokuModel
             return JsonConvert.SerializeObject(sudoku);
         }
 
-        private static T GetField<T>(JObject jsonObject, string name)
+        /// <summary>
+        /// Converts the rough structure of this Sudoku into JSON. Only cells containing a big
+        /// digit are transcribed, and all state except that digit is disregarded. This is used for
+        /// communication with the engine.
+        /// </summary>
+        public string ToJson()
         {
-            if (!jsonObject.TryGetValue(name, out JToken field))
-                throw new ParseSudokuException();
+            return ToJsonWith(cell =>
+            {
+                int digit = cell.Digit;
 
-            if (!(field is T t))
-                throw new ParseSudokuException();
-
-            return t;
+                if (digit == 0) return JValue.CreateNull();
+                else return digit;
+            });
         }
 
-        private static int ToInt(JToken token)
-        {
-            if (token.Type == JTokenType.Integer)
-                return (int)token;
+        /// <summary>
+        /// Converts the full state of this Sudoku into JSON. This includes all digits,
+        /// annotations, and the lock status of each cell. This is used for savegames.
+        /// </summary>
+        public string ToFullJson() =>
+            ToJsonWith(cell => cell.ToJson());
 
-            if (token.Type == JTokenType.Null)
-                return 0;
-
-            throw new ParseSudokuException();
-        }
-
-        public static Sudoku ParseJson(string json)
+        private static Sudoku ParseJsonWith(string json, Func<JToken, SudokuCell> cellParser)
         {
             var sudokuToken = JToken.Parse(json);
 
@@ -157,17 +156,17 @@ namespace Sudoverse.SudokuModel
                 throw new ParseSudokuException();
 
             var constraint = ConstraintUtil.FromJson(constraintToken);
-            var grid = GetField<JObject>(sudokuObject, "grid");
-            int blockWidth = ToInt(GetField<JValue>(grid, "block_width"));
-            int blockHeight = ToInt(GetField<JValue>(grid, "block_height"));
+            var grid = sudokuObject.GetField<JObject>("grid");
+            int blockWidth = grid.GetField<JValue>("block_width").ToInt();
+            int blockHeight = grid.GetField<JValue>("block_height").ToInt();
             Sudoku result = new Sudoku(blockWidth, blockHeight, constraint);
-            var jsonCells = GetField<JArray>(grid, "cells");
+            var jsonCells = grid.GetField<JArray>("cells");
 
             SudokuCell[] cells = new SudokuCell[jsonCells.Count];
 
             for (int i = 0; i < cells.Length; i++)
             {
-                cells[i] = new SudokuCell(ToInt(jsonCells[i]));
+                cells[i] = cellParser(jsonCells[i]);
             }
 
             if (cells.Length != result.cells.Length)
@@ -176,5 +175,20 @@ namespace Sudoverse.SudokuModel
             result.cells = cells;
             return result;
         }
+
+        /// <summary>
+        /// Parses the rough stucture of a Sudoku from JSON. Only cells containing a big
+        /// digit are transcribed, and all state except that digit is disregarded. This is used for
+        /// communication with the engine.
+        /// </summary>
+        public static Sudoku ParseJson(string json) =>
+            ParseJsonWith(json, token => new SudokuCell(token.ToInt()));
+
+        /// <summary>
+        /// Parses the full state of this Sudoku from JSON. This includes all digits, annotations,
+        /// and the lock status of each cell. This is used for savegames.
+        /// </summary>
+        public static Sudoku ParseFullJson(string json) =>
+            ParseJsonWith(json, token => SudokuCell.ParseJson(token));
     }
 }

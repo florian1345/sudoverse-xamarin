@@ -20,12 +20,9 @@ namespace Sudoverse.Display
         private SudokuCell cell;
         private Label[] cornerLabels;
 
-        public bool Locked { get; private set; }
-
         public SudokuCellView(SudokuCell cell)
         {
             InitializeComponent();
-            LabelCenter.TextColor = UnlockedColor;
             cell.Updated += (s, e) => Update();
             this.cell = cell;
             cornerLabels = new Label[]
@@ -36,7 +33,7 @@ namespace Sudoverse.Display
                 LabelBottomRight
             };
 
-            LabelCenter.TextColor = UnlockedColor;
+            LabelCenter.TextColor = cell.Locked ? LockedColor : UnlockedColor;
 
             foreach (var label in cornerLabels)
                 label.TextColor = UnlockedColor;
@@ -69,12 +66,6 @@ namespace Sudoverse.Display
                     cornerLabels[i].Text = "";
                 }
             }
-        }
-
-        public void Lock()
-        {
-            Locked = true;
-            LabelCenter.TextColor = LockedColor;
         }
 
         public void Select()
