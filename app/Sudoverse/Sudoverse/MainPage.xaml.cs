@@ -18,6 +18,9 @@ namespace Sudoverse
 		{
 			InitializeComponent();
 
+			if (!SaveManager.HasCurrent())
+				ButtonContinue.IsEnabled = false;
+
 			try
             {
 				VerifyEngine();
@@ -30,6 +33,7 @@ namespace Sudoverse
 				// Since Xamarin does not allow us to exit the app, we make it useless instead.
 
 				ButtonPlay.IsEnabled = false;
+				ButtonContinue.IsEnabled = false;
 			}
 		}
 
@@ -49,5 +53,10 @@ namespace Sudoverse
 		{
 			App.Current.MainPage = new PlayOptionsPage();
 		}
+
+		private void OnContinue(object sender, EventArgs e)
+        {
+			App.Current.MainPage = new PlayPage(SaveManager.LoadCurrent());
+        }
 	}
 }

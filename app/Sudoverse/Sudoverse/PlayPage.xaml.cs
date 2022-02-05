@@ -35,6 +35,11 @@ namespace Sudoverse
 			redos = new DropOutStack<Operation>(UNDO_CAPACITY);
 		}
 
+		public void SaveCurrent()
+        {
+			SaveManager.SaveCurrent(sudokuView.Sudoku);
+		}
+
 		private void UpdateNotationButton(ImageButton button, bool selected)
 		{
 			if (selected)
@@ -186,8 +191,13 @@ namespace Sudoverse
 			string json = sudokuView.Sudoku.ToJson();
 			
 			if (SudokuEngineProvider.Engine.Check(json))
-            {
-				DisplayAlert("Check", "Correct.", "Ok");
+			{
+				if (sudokuView.Sudoku.Full)
+				{
+					DisplayAlert("Check", "Congratulations, you won!", "Ok");
+					SaveManager.RemoveCurrent();
+				}
+				else DisplayAlert("Check", "No mistakes so far.", "Ok");
             }
 			else
             {
@@ -197,6 +207,7 @@ namespace Sudoverse
 
 		private void OnBack(object sender, EventArgs e)
 		{
+			SaveCurrent();
 			App.Current.MainPage = new MainPage();
 		}
 
