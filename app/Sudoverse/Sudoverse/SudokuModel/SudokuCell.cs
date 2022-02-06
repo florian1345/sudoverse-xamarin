@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using Sudoverse.Util;
 using System;
 using System.Collections.Generic;
 
@@ -10,9 +9,6 @@ namespace Sudoverse.SudokuModel
     /// </summary>
     public sealed class SudokuCell
     {
-        private SortedSet<int> smallDigits;
-        private SortedSet<int> cornerDigits;
-
         public event EventHandler Updated;
 
         /// <summary>
@@ -32,32 +28,24 @@ namespace Sudoverse.SudokuModel
         public bool Filled => Digit > 0;
 
         /// <summary>
-        /// A <see cref="ReadOnlySet{T}"/> which contains all small digits in the center of this
-        /// cell. They may be ignored if <see cref="Digit"/> is not 0.
+        /// The pencilmark contained in this cell. This may be hidden by its big digit.
         /// </summary>
-        public ReadOnlySet<int> SmallDigits => new ReadOnlySet<int>(smallDigits);
+        public IPencilmark Pencilmark { get; }
 
         /// <summary>
-        /// A <see cref="ReadOnlySet{T}"/> which contains all small digits in the corners of this
-        /// cell. They may be ignored if <see cref="Digit"/> is not 0.
+        /// Creates a new, empty Sudoku cell with the given pencilmark.
         /// </summary>
-        public ReadOnlySet<int> CornerDigits => new ReadOnlySet<int>(cornerDigits);
-
-        /// <summary>
-        /// Creates a new, empty Sudoku cell.
-        /// </summary>
-        public SudokuCell()
-            : this(0) { }
+        public SudokuCell(IPencilmark pencilmark)
+            : this(pencilmark, 0) { }
 
         /// <summary>
         /// Creates a new locked Sudoku cell filled with the given digit, or an unlocked, empty
-        /// cell if it is 0.
+        /// cell with the given pencilmark if it is 0.
         /// </summary>
-        public SudokuCell(int digit)
+        public SudokuCell(IPencilmark pencilmark, int digit)
         {
             Digit = digit;
-            smallDigits = new SortedSet<int>();
-            cornerDigits = new SortedSet<int>();
+            Pencilmark = pencilmark;
 
             if (digit > 0)
                 Locked = true;
@@ -66,133 +54,78 @@ namespace Sudoverse.SudokuModel
         /// <summary>
         /// Clears the top layer of this cell, i.e. the big digit, if there is one, or the small-
         /// and corner-digits otherwise. A cell with annotations and a digit requires clearing
-        /// twice. Returns <tt>true</tt> if and only if something changed.
+        /// twice. Returns an enumeration of all digits with their notation that need to be entered
+        /// for the previous state to be restored.
         /// </summary>
-        public bool Clear()
+        public IEnumerable<(int, Notation)> Clear()
         {
-            if (Locked) return false;
-
-            if (Filled)
+            if (!Locked)
             {
-                Digit = 0;
-                Updated?.Invoke(this, new EventArgs());
-                return true;
-            }
-            else if (smallDigits.Count + cornerDigits.Count > 0)
-            {
-                smallDigits.Clear();
-                cornerDigits.Clear();
-                Updated?.Invoke(this, new EventArgs());
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Enters a big digit to the cell. For clearing, use <see cref="Clear"/> instead. Returns
-        /// true if changed.
-        /// </summary>
-        public bool EnterNormal(int digit)
-        {
-            if (Locked) return false;
-
-            if (Digit != digit)
-            {
-                Digit = digit;
-                Updated?.Invoke(this, new EventArgs());
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Toggles a small digit to the corners of this cell. If there are already four different
-        /// digits in the corners, nothing is changed. True is returned if something changed.
-        /// </summary>
-        public bool ToggleCorner(int digit)
-        {
-            if (Locked) return false;
-
-            if (cornerDigits.Add(digit))
-            {
-                if (cornerDigits.Count > 4)
+                if (Filled)
                 {
-                    cornerDigits.Remove(digit);
-                    return false;
+                    var oldDigit = Digit;
+                    Digit = 0;
+                    Updated?.Invoke(this, new EventArgs());
+                    yield return (oldDigit, Notation.Normal);
                 }
+                else
+                {
+                    var enumerable = Pencilmark.Clear();
+                    bool some = false;
 
-                Updated?.Invoke(this, new EventArgs());
-                return true;
-            }
-            else if (cornerDigits.Remove(digit))
-            {
-                Updated?.Invoke(this, new EventArgs());
-                return true;
-            }
+                    foreach (var item in enumerable)
+                    {
+                        some = true;
+                        yield return item;
+                    }
 
-            return false;
+                    if (some) Updated?.Invoke(this, new EventArgs());
+                }
+            }
         }
 
         /// <summary>
-        /// Enters a small digit to the center of this cell. Returns <tt>true</tt> if and only if
-        /// something changed.
+        /// Enters a digit to the cell using the given notation. If this is
+        /// <see cref="Notation.Normal"/>, the big digit will be replaced, otherwise the call will
+        /// be forwarded to <see cref="IPencilmark.Enter(int, Notation)"/> for the pencilmark in
+        /// this cell.
         /// </summary>
-        public bool ToggleSmall(int digit)
+        public bool Enter(int digit, Notation notation)
         {
             if (Locked) return false;
 
-            if (smallDigits.Add(digit) || smallDigits.Remove(digit))
+            if (notation == Notation.Normal)
+            {
+                if (Digit != digit)
+                {
+                    Digit = digit;
+                    Updated?.Invoke(this, new EventArgs());
+                    return true;
+                }
+                else return false;
+            }
+            else if (!Filled && Pencilmark.Enter(digit, notation))
             {
                 Updated?.Invoke(this, new EventArgs());
                 return true;
             }
 
             return false;
-        }
-
-        private JArray ToJArray(SortedSet<int> digits)
-        {
-            var array = new JArray();
-
-            foreach (int digit in digits)
-            {
-                array.Add(digit);
-            }
-
-            return array;
         }
 
         public JObject ToJson()
         {
-            var small = ToJArray(smallDigits);
-            var corner = ToJArray(cornerDigits);
+            var pencilmark = Pencilmark.ToJson();
 
             return new JObject()
             {
                 { "locked", Locked },
                 { "digit", Digit },
-                { "small", small },
-                { "corner", corner }
+                { "pencilmark", pencilmark }
             };
         }
-
-        private static SortedSet<int> FromJArray(JArray array)
-        {
-            var set = new SortedSet<int>();
-
-            foreach (JValue jvalue in array)
-            {
-                set.Add(jvalue.ToInt());
-            }
-
-            return set;
-        }
         
-        public static SudokuCell ParseJson(JToken token)
+        public static SudokuCell ParseJson(JToken token, PencilmarkType pencilmarkType)
         {
             if (!(token is JObject jobject))
                 throw new ParseSudokuException();
@@ -204,15 +137,12 @@ namespace Sudoverse.SudokuModel
 
             var locked = (bool)lockedValue;
             var digit = jobject.GetField<JValue>("digit").ToInt();
-            var smallDigits = FromJArray(jobject.GetField<JArray>("small"));
-            var cornerDigits = FromJArray(jobject.GetField<JArray>("corner"));
+            var pencilmark = pencilmarkType.FromJson(jobject.GetValue("pencilmark"));
 
-            return new SudokuCell()
+            return new SudokuCell(pencilmark)
             {
                 Digit = digit,
-                Locked = locked,
-                smallDigits = smallDigits,
-                cornerDigits = cornerDigits
+                Locked = locked
             };
         }
     }

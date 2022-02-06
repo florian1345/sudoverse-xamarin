@@ -18,6 +18,7 @@ namespace Sudoverse
 		private SudokuView sudokuView;
 		private DropOutStack<Operation> undos;
 		private DropOutStack<Operation> redos;
+		private Notation notation1 = Notation.Center;
 
 		public PlayPage(Sudoku sudoku)
 		{
@@ -28,11 +29,20 @@ namespace Sudoverse
 			KeyUp += OnKeyUp;
 
 			ButtonNotationNormal.BorderColor = NotationButtonSelectedBackground;
-			ButtonNotationSmall.BorderColor = NotationButtonUnselectedBackground;
-			ButtonNotationCorner.BorderColor = NotationButtonUnselectedBackground;
+			ButtonNotation1.BorderColor = NotationButtonUnselectedBackground;
+			ButtonNotation2.BorderColor = NotationButtonUnselectedBackground;
 
 			undos = new DropOutStack<Operation>(UNDO_CAPACITY);
 			redos = new DropOutStack<Operation>(UNDO_CAPACITY);
+
+			// TODO make more dynamic
+			if (sudokuView.Sudoku.PencilmarkType == PencilmarkType.PositionalPencilmarkType)
+            {
+				ButtonNotation1.Source = "notation_positional.png";
+				notation1 = Notation.Positional;
+				ButtonNotation2.IsEnabled = false;
+				ButtonNotation2.IsVisible = false;
+            }
 		}
 
 		public void SaveCurrent()
@@ -51,8 +61,8 @@ namespace Sudoverse
 		private void UpdateNotationButtons()
         {
 			UpdateNotationButton(ButtonNotationNormal, notation == Notation.Normal);
-			UpdateNotationButton(ButtonNotationSmall, notation == Notation.Small);
-			UpdateNotationButton(ButtonNotationCorner, notation == Notation.Corner);
+			UpdateNotationButton(ButtonNotation1, notation == notation1);
+			UpdateNotationButton(ButtonNotation2, notation == Notation.Border);
 		}
 
 		private void PushUndo(Operation operation)
@@ -222,14 +232,14 @@ namespace Sudoverse
 			SetNotation(Notation.Normal);
 		}
 
-		private void OnNotationSmall(object sender, EventArgs e)
+		private void OnNotation1(object sender, EventArgs e)
 		{
-			SetNotation(Notation.Small);
+			SetNotation(notation1);
 		}
 
-		private void OnNotationCorner(object sender, EventArgs e)
+		private void OnNotation2(object sender, EventArgs e)
 		{
-			SetNotation(Notation.Corner);
+			SetNotation(Notation.Border);
 		}
 
 		private void Undo()

@@ -13,13 +13,21 @@
         Normal,
 
         /// <summary>
-        /// "Small" notation, i.e. a group of small digits in the center of the cell.
+        /// "Center" notation, i.e. a group of small digits in the center of the cell. Used in the
+        /// <see cref="CenterBorderPencilmark"/>.
         /// </summary>
-        Small,
+        Center,
 
         /// <summary>
-        /// "Corner" notation, i.e. at most four small digis in the corners of the cell.
+        /// "Border" notation, i.e. at most eight small digis along the border of the cell. Corners
+        /// are filled first. Used in the <see cref="CenterBorderPencilmark"/>.
         /// </summary>
-        Corner
+        Border,
+
+        /// <summary>
+        /// "Positional" notation, i.e. the digit is entered in a position according to its value.
+        /// Used in the <see cref="PositionalPencilmark"/>.
+        /// </summary>
+        Positional
     }
 }

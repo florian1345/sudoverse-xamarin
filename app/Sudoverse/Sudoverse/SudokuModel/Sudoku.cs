@@ -12,6 +12,7 @@ namespace Sudoverse.SudokuModel
         public int BlockHeight { get; private set; }
         public int Size { get; private set; }
         public IConstraint Constraint { get; private set; }
+        public PencilmarkType PencilmarkType { get; }
 
         /// <summary>
         /// Indicates whether this Sudoku is full, i.e. all cells contain a big digit.
@@ -20,7 +21,8 @@ namespace Sudoverse.SudokuModel
 
         private SudokuCell[] cells;
 
-        public Sudoku(int blockWidth, int blockHeight, IConstraint constraint)
+        public Sudoku(int blockWidth, int blockHeight, IConstraint constraint,
+            PencilmarkType pencilmarkType)
         {
             if (blockWidth <= 0 || blockHeight <= 0)
                 throw new ArgumentException("Block width and height must be positive.");
@@ -29,11 +31,12 @@ namespace Sudoverse.SudokuModel
             BlockHeight = blockHeight;
             Size = BlockWidth * BlockHeight;
             Constraint = constraint;
+            PencilmarkType = pencilmarkType;
             cells = new SudokuCell[Size * Size];
 
             for (int i = 0; i < cells.Length; i++)
             {
-                cells[i] = new SudokuCell();
+                cells[i] = new SudokuCell(PencilmarkType.Empty());
             }
         }
 
@@ -48,33 +51,18 @@ namespace Sudoverse.SudokuModel
         public Operation EnterCell(int column, int row, int digit, Notation notation)
         {
             var cell = cells[row * Size + column];
+            var oldDigit = cell.Digit;
 
-            switch (notation)
+            if (cell.Enter(digit, notation))
             {
-                case Notation.Normal:
-                    if (digit != cell.Digit)
-                    {
-                        int oldDigit = cell.Digit;
-
-                        if (cell.EnterNormal(digit))
-                        {
-                            if (oldDigit == 0)
-                                return new ClearOperation(column, row);
-                            else return new EnterOperation(column, row, oldDigit, notation);
-                        }
-                    }
-
-                    break;
-                case Notation.Small:
-                    if (!cell.Filled && cell.ToggleSmall(digit))
-                        return new EnterOperation(column, row, digit, notation);
-
-                    break;
-                case Notation.Corner:
-                    if (!cell.Filled && cell.ToggleCorner(digit))
-                        return new EnterOperation(column, row, digit, notation);
-
-                    break;
+                switch (notation)
+                {
+                    case Notation.Normal:
+                        if (oldDigit == 0)
+                            return new ClearOperation(column, row);
+                        else return new EnterOperation(column, row, oldDigit, notation);
+                    default: return new EnterOperation(column, row, digit, notation);
+                }
             }
 
             return new NoOperation();
@@ -83,26 +71,20 @@ namespace Sudoverse.SudokuModel
         public Operation ClearCell(int column, int row)
         {
             var cell = GetCell(column, row);
+            var inverseOperations = cell.Clear()
+                .Select(op =>
+                    new EnterOperation(column, row, op.Item1, op.Item2))
+                .ToArray();
 
-            if (cell.Filled)
+            switch (inverseOperations.Length)
             {
-                var digit = cell.Digit;
-                if (!cell.Clear()) return new NoOperation();
-                return new EnterOperation(column, row, digit, Notation.Normal);
-            }
-            else
-            {
-                var inverseOperations = cell.SmallDigits
-                    .Select(d => new EnterOperation(column, row, d, Notation.Small))
-                    .Concat(cell.CornerDigits
-                        .Select(d => new EnterOperation(column, row, d, Notation.Corner)))
-                    .ToArray();
-                cell.Clear();
-                return new CompositeOperation(inverseOperations);
+                case 0: return new NoOperation();
+                case 1: return inverseOperations[0];
+                default: return new CompositeOperation(inverseOperations);
             }
         }
 
-        private string ToJsonWith(Func<SudokuCell, JToken> cellConverter)
+        private string ToJsonWith(Func<SudokuCell, JToken> cellConverter, bool addPencilmarkType)
         {
             var cellsJson = new JArray();
 
@@ -119,6 +101,10 @@ namespace Sudoverse.SudokuModel
             var sudoku = new JObject();
             sudoku.Add("grid", grid);
             sudoku.Add("constraint", ConstraintUtil.ToJson(Constraint));
+
+            if (addPencilmarkType)
+                sudoku.Add("pencilmark_type", PencilmarkType.GetIdentifier());
+
             return JsonConvert.SerializeObject(sudoku);
         }
 
@@ -135,7 +121,7 @@ namespace Sudoverse.SudokuModel
 
                 if (digit == 0) return JValue.CreateNull();
                 else return digit;
-            });
+            }, false);
         }
 
         /// <summary>
@@ -143,9 +129,10 @@ namespace Sudoverse.SudokuModel
         /// annotations, and the lock status of each cell. This is used for savegames.
         /// </summary>
         public string ToFullJson() =>
-            ToJsonWith(cell => cell.ToJson());
+            ToJsonWith(cell => cell.ToJson(), true);
 
-        private static Sudoku ParseJsonWith(string json, Func<JToken, SudokuCell> cellParser)
+        private static Sudoku ParseJsonWith(string json,
+            Func<JToken, PencilmarkType, SudokuCell> cellParser, PencilmarkType pencilmarkType)
         {
             var sudokuToken = JToken.Parse(json);
 
@@ -159,14 +146,25 @@ namespace Sudoverse.SudokuModel
             var grid = sudokuObject.GetField<JObject>("grid");
             int blockWidth = grid.GetField<JValue>("block_width").ToInt();
             int blockHeight = grid.GetField<JValue>("block_height").ToInt();
-            Sudoku result = new Sudoku(blockWidth, blockHeight, constraint);
+
+            if (pencilmarkType == null)
+            {
+                var idValue = sudokuObject.GetField<JValue>("pencilmark_type");
+
+                if (idValue.Type != JTokenType.String)
+                    throw new ParseSudokuException();
+
+                pencilmarkType = PencilmarkType.FromIdentifier((string)idValue);
+            }
+
+            Sudoku result = new Sudoku(blockWidth, blockHeight, constraint, pencilmarkType);
             var jsonCells = grid.GetField<JArray>("cells");
 
             SudokuCell[] cells = new SudokuCell[jsonCells.Count];
 
             for (int i = 0; i < cells.Length; i++)
             {
-                cells[i] = cellParser(jsonCells[i]);
+                cells[i] = cellParser(jsonCells[i], pencilmarkType);
             }
 
             if (cells.Length != result.cells.Length)
@@ -179,16 +177,18 @@ namespace Sudoverse.SudokuModel
         /// <summary>
         /// Parses the rough stucture of a Sudoku from JSON. Only cells containing a big
         /// digit are transcribed, and all state except that digit is disregarded. This is used for
-        /// communication with the engine.
+        /// communication with the engine. The pencilmark type must be provided, since it is not
+        /// stored in the JSON data.
         /// </summary>
-        public static Sudoku ParseJson(string json) =>
-            ParseJsonWith(json, token => new SudokuCell(token.ToInt()));
+        public static Sudoku ParseJson(string json, PencilmarkType pencilmarkType) =>
+            ParseJsonWith(json, (token, ptype) => new SudokuCell(ptype.Empty(), token.ToInt()),
+                pencilmarkType);
 
         /// <summary>
         /// Parses the full state of this Sudoku from JSON. This includes all digits, annotations,
         /// and the lock status of each cell. This is used for savegames.
         /// </summary>
         public static Sudoku ParseFullJson(string json) =>
-            ParseJsonWith(json, token => SudokuCell.ParseJson(token));
+            ParseJsonWith(json, (token, ptype) => SudokuCell.ParseJson(token, ptype), null);
     }
 }

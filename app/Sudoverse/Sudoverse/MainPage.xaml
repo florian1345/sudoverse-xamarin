@@ -23,6 +23,14 @@
                 Clicked="OnPlay"
                 HorizontalOptions="Center" />
 
+            <Button
+                x:Name="ButtonSettings"
+                Text="Settings"
+                FontAttributes="Bold"
+                Grid.Row="2"
+                Clicked="OnSettings"
+                HorizontalOptions="Center" />
+
         </Grid>
     </ScrollView>
 

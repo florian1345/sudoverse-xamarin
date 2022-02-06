@@ -97,7 +97,7 @@ namespace Sudoverse
         {
             int difficulty = DifficultySlider.Difficulty;
             string json = SudokuEngineProvider.Engine.Gen(selectedRuleConfig.ConstraintId, difficulty);
-            var sudoku = Sudoku.ParseJson(json);
+            var sudoku = Sudoku.ParseJson(json, Config.PencilmarkType);
             App.Current.MainPage = new PlayPage(sudoku);
         }
     }

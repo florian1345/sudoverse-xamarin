@@ -58,5 +58,10 @@ namespace Sudoverse
         {
 			App.Current.MainPage = new PlayPage(SaveManager.LoadCurrent());
         }
+
+		private void OnSettings(object sender, EventArgs e)
+        {
+			App.Current.MainPage = new SettingsPage();
+        }
 	}
 }

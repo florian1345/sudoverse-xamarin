@@ -44,11 +44,11 @@
                 Grid.Column="3" />
 
             <ImageButton
-                x:Name="ButtonNotationSmall"
+                x:Name="ButtonNotation1"
                 Source="notation_small.png"
                 Grid.Row="1"
                 Grid.Column="0"
-                Clicked="OnNotationSmall"
+                Clicked="OnNotation1"
                 BorderWidth="5" />
 
             <Button
@@ -76,11 +76,11 @@
                 Grid.Column="3" />
 
             <ImageButton
-                x:Name="ButtonNotationCorner"
+                x:Name="ButtonNotation2"
                 Source="notation_corner.png"
                 Grid.Row="2"
                 Grid.Column="0"
-                Clicked="OnNotationCorner"
+                Clicked="OnNotation2"
                 BorderWidth="5" />
 
             <Button
