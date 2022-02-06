@@ -30,6 +30,14 @@
                 VerticalOptions="Center" />
             <Label
                 Text=""
+                AbsoluteLayout.LayoutBounds="0.4875,-0.025,0.2,0.3"
+                AbsoluteLayout.LayoutFlags="All"
+                x:Name="LabelTopCenter"
+                FontFamily="DigitFont"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+            <Label
+                Text=""
                 AbsoluteLayout.LayoutBounds="0.925,-0.025,0.2,0.3"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="LabelTopRight"
@@ -37,9 +45,32 @@
                 VerticalOptions="Center" />
             <Label
                 Text=""
+                AbsoluteLayout.LayoutBounds="0.05,0.425,0.2,0.3"
+                AbsoluteLayout.LayoutFlags="All"
+                x:Name="LabelCenterLeft"
+                FontFamily="DigitFont"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+            <Label
+                Text=""
+                AbsoluteLayout.LayoutBounds="0.925,0.425,0.2,0.3"
+                AbsoluteLayout.LayoutFlags="All"
+                x:Name="LabelCenterRight"
+                FontFamily="DigitFont"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+            <Label
+                Text=""
                 AbsoluteLayout.LayoutBounds="0.05,0.875,0.2,0.3"
                 AbsoluteLayout.LayoutFlags="All"
                 x:Name="LabelBottomLeft"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+            <Label
+                Text=""
+                AbsoluteLayout.LayoutBounds="0.4875,0.875,0.2,0.3"
+                AbsoluteLayout.LayoutFlags="All"
+                x:Name="LabelBottomCenter"
                 HorizontalOptions="Center"
                 VerticalOptions="Center" />
             <Label

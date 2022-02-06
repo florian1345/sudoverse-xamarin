@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Sudoverse.SudokuModel
+﻿namespace Sudoverse.SudokuModel
 {
     public abstract class Operation
     {

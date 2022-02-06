@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Sudoverse.SettingsPage">
+    <ContentPage.Content>
+        <StackLayout
+                Spacing="20"
+                Margin="20,0,20,0" >
+            <Label
+                Text="Settings"
+                FontSize="Large"
+                VerticalOptions="EndAndExpand" 
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center" />
+            <StackLayout
+                    Orientation="Horizontal"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center">
+                <Label
+                    Text="Pencil Mark Style"
+                    FontSize="Medium"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    MaxLines="1" />
+                <Picker
+                        x:Name="PencilmarkTypePicker"
+                        VerticalOptions="Fill"
+                        HorizontalOptions="Fill" >
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>Center &amp; Border</x:String>
+                            <x:String>Positional</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+            </StackLayout>
+            <StackLayout
+                    Orientation="Horizontal"
+                    VerticalOptions="StartAndExpand" 
+                    HorizontalOptions="CenterAndExpand">
+                <Button
+                    Text="Abort"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center"
+                    Clicked="OnAbort" />
+                <Button
+                    Text="Accept"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center"
+                    Clicked="OnAccept" />
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

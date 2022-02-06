@@ -18,7 +18,7 @@ namespace Sudoverse.Display
 
         private double fontSize;
         private SudokuCell cell;
-        private Label[] cornerLabels;
+        private Label[] borderLabels;
 
         /// <summary>
         /// Gets the current big digit entered in this cell, or 0 if it is empty.
@@ -30,17 +30,21 @@ namespace Sudoverse.Display
             InitializeComponent();
             cell.Updated += (s, e) => Update();
             this.cell = cell;
-            cornerLabels = new Label[]
+            borderLabels = new Label[]
             {
                 LabelTopLeft,
+                LabelTopCenter,
                 LabelTopRight,
+                LabelCenterLeft,
+                LabelCenterRight,
                 LabelBottomLeft,
+                LabelBottomCenter,
                 LabelBottomRight
             };
 
             LabelCenter.TextColor = cell.Locked ? LockedColor : UnlockedColor;
 
-            foreach (var label in cornerLabels)
+            foreach (var label in borderLabels)
                 label.TextColor = UnlockedColor;
         }
 
@@ -51,25 +55,21 @@ namespace Sudoverse.Display
                 LabelCenter.FontSize = fontSize;
                 LabelCenter.Text = cell.Digit.ToString();
 
-                foreach (var label in cornerLabels)
+                foreach (var label in borderLabels)
                     label.Text = "";
             }
             else
             {
                 LabelCenter.FontSize = SMALL_FONT_FACTOR * fontSize;
-                LabelCenter.Text = string.Join("", cell.SmallDigits.Select(d => d.ToString()));
-                int i = 0;
-
-                foreach (int cornerDigit in cell.CornerDigits)
-                {
-                    cornerLabels[i].Text = cornerDigit.ToString();
-                    i++;
-                }
-
-                for (; i < cornerLabels.Length; i++)
-                {
-                    cornerLabels[i].Text = "";
-                }
+                LabelTopLeft.Text = cell.Pencilmark.TopLeft;
+                LabelTopCenter.Text = cell.Pencilmark.TopCenter;
+                LabelTopRight.Text = cell.Pencilmark.TopRight;
+                LabelCenterLeft.Text = cell.Pencilmark.CenterLeft;
+                LabelCenter.Text = cell.Pencilmark.Center;
+                LabelCenterRight.Text = cell.Pencilmark.CenterRight;
+                LabelBottomLeft.Text = cell.Pencilmark.BottomLeft;
+                LabelBottomCenter.Text = cell.Pencilmark.BottomCenter;
+                LabelBottomRight.Text = cell.Pencilmark.BottomRight;
             }
         }
 
@@ -88,7 +88,7 @@ namespace Sudoverse.Display
             this.fontSize = fontSize;
             var smallFontSize = SMALL_FONT_FACTOR * fontSize;
             
-            foreach (var label in cornerLabels)
+            foreach (var label in borderLabels)
                 label.FontSize = smallFontSize;
 
             Update();
