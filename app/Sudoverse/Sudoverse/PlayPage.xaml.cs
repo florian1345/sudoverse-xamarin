@@ -19,6 +19,7 @@ namespace Sudoverse
 		private DropOutStack<Operation> undos;
 		private DropOutStack<Operation> redos;
 		private Notation notation1 = Notation.Center;
+		private bool finished = false;
 
 		public PlayPage(Sudoku sudoku)
 		{
@@ -47,7 +48,7 @@ namespace Sudoverse
 
 		public void SaveCurrent()
         {
-			SaveManager.SaveCurrent(sudokuView.Sudoku);
+			if (!finished) SaveManager.SaveCurrent(sudokuView.Sudoku);
 		}
 
 		private void UpdateNotationButton(ImageButton button, bool selected)
@@ -77,11 +78,13 @@ namespace Sudoverse
 		private void Enter(int digit)
         {
 			PushUndo(sudokuView.Enter(digit, notation));
+			finished = false;
 		}
 
 		private void Clear()
 		{
 			PushUndo(sudokuView.ClearSelected());
+			finished = false;
 		}
 
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -205,6 +208,7 @@ namespace Sudoverse
 				if (sudokuView.Sudoku.Full)
 				{
 					DisplayAlert("Check", "Congratulations, you won!", "Ok");
+					finished = true;
 					SaveManager.RemoveCurrent();
 				}
 				else DisplayAlert("Check", "No mistakes so far.", "Ok");
