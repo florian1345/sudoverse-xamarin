@@ -117,6 +117,7 @@
     <Content Include="Assets\Images\notation_normal.png" />
     <Content Include="Assets\Images\notation_positional.png" />
     <Content Include="Assets\Images\notation_small.png" />
+    <Content Include="Assets\Images\rules_chess.png" />
     <Content Include="Assets\Images\rules_classic.png" />
     <Content Include="Assets\Images\rules_diagonal.png" />
     <Content Include="Assets\Images\rules_kings_move.png" />
