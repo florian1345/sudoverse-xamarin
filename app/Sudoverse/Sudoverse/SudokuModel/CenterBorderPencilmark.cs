@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Sudoverse.Util;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -146,7 +147,7 @@ namespace Sudoverse.SudokuModel
         public static CenterBorderPencilmark FromJson(JToken token)
         {
             if (!(token is JObject jobject))
-                throw new ParseSudokuException();
+                throw new ParseJsonException();
 
             var centerDigits = FromJArray(jobject.GetField<JArray>("center"));
             var borderDigits = FromJArray(jobject.GetField<JArray>("border"));

@@ -1,16 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sudoverse.SudokuModel;
+using Sudoverse.Util;
 using System;
 using System.IO;
 
 namespace Sudoverse
 {
-    public sealed class ParseConfigException : Exception
-    {
-        public ParseConfigException()
-            : base("Error parsing config file.") { }
-    }
-
     /// <summary>
     /// Handles loading and saving of the config file.
     /// </summary>
@@ -40,12 +35,12 @@ namespace Sudoverse
                 var configToken = JToken.Parse(json);
 
                 if (!(configToken is JObject configObject))
-                    throw new ParseConfigException();
+                    throw new ParseJsonException();
 
                 if (configObject.TryGetValue("pencilmark_type", out JToken pencilmarkTypeToken))
                 {
                     if (pencilmarkTypeToken.Type != JTokenType.String)
-                        throw new ParseConfigException();
+                        throw new ParseJsonException(pencilmarkTypeToken.Type, JTokenType.String);
 
                     pencilmarkType = PencilmarkType.FromIdentifier((string)pencilmarkTypeToken);
                 }

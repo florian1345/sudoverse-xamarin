@@ -3,7 +3,6 @@ using Sudoverse.Touch;
 using Sudoverse.Util;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xamarin.Forms;
 using Xamarin.Forms.Shapes;
 
@@ -30,6 +29,7 @@ namespace Sudoverse.Display
         private Line[] horizontalLines;
         private Line[] verticalLines;
         private HashSet<(int, int)> selected;
+        private ICollection<(int, int)> markedInvalid;
         private bool mouseDown;
 
         public SharedFlag ShiftDown { get; }
@@ -146,6 +146,16 @@ namespace Sudoverse.Display
             }
         }
 
+        private void DeselectAll()
+        {
+            foreach ((int selectedColumn, int selectedRow) in selected)
+            {
+                cells[selectedColumn, selectedRow].Deselect();
+            }
+
+            selected.Clear();
+        }
+
         private void OnPressed(int column, int row, SudokuCellView view, SelectMode selectMode)
         {
             mouseDown = true;
@@ -159,12 +169,7 @@ namespace Sudoverse.Display
                         return;
                     }
 
-                    foreach ((int selectedColumn, int selectedRow) in selected)
-                    {
-                        cells[selectedColumn, selectedRow].Deselect();
-                    }
-
-                    selected.Clear();
+                    DeselectAll();
                     goto case SelectMode.Add;
                 case SelectMode.Add:
                     if (selected.Add((column, row)))
@@ -174,6 +179,19 @@ namespace Sudoverse.Display
                     if (selected.Remove((column, row)))
                         view.Deselect();
                     break;
+            }
+        }
+
+        private void ResetInvalid()
+        {
+            if (markedInvalid != null)
+            {
+                foreach ((int column, int row) in markedInvalid)
+                {
+                    cells[column, row].Deselect();
+                }
+
+                markedInvalid = null;
             }
         }
 
@@ -200,6 +218,8 @@ namespace Sudoverse.Display
 
             if (ShiftDown) selectMode = SelectMode.Add;
             else if (ControlDown) selectMode = SelectMode.Remove;
+
+            ResetInvalid();
 
             switch (e.Type)
             {
@@ -246,6 +266,18 @@ namespace Sudoverse.Display
 
         public Operation ClearSelected() =>
             ApplyToSelected((column, row) => Sudoku.ClearCell(column, row));
+
+        public void MarkInvalid(ICollection<(int, int)> invalidCells)
+        {
+            DeselectAll();
+
+            foreach ((int column, int row) in invalidCells)
+            {
+                cells[column, row].SetInvalid();
+            }
+
+            markedInvalid = invalidCells;
+        }
 
         protected override void LayoutChildren(double x, double y, double width, double height)
         {

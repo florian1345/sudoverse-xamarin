@@ -13,7 +13,7 @@ namespace Sudoverse.Droid
         {
             base.OnCreate(savedInstanceState);
 
-            SudokuEngineProvider.Engine = new AndroidSudokuEngine();
+            SudokuEngineProvider.SetEngine(new AndroidSudokuEngine());
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             Xamarin.Forms.Forms.Init(this, savedInstanceState);
             LoadApplication(new App());

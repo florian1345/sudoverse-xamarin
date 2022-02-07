@@ -10,9 +10,10 @@
 //! * `2` for knight's move Sudoku
 //! * `3` for king's move Sudoku
 
+use crate::check_response::CheckResponse;
+use crate::constraint::AnyConstraint;
 use crate::sync::CancelHandle;
 
-use constraint::AnyConstraint;
 use serde::Serialize;
 
 use std::ffi::{CStr, CString};
@@ -46,6 +47,7 @@ use sudoku_variants::solver::strategy::{
     TupleStrategy
 };
 
+mod check_response;
 mod constraint;
 mod sync;
 
@@ -322,6 +324,14 @@ where
     result
 }
 
+fn to_json_for_return(s: &impl Serialize) -> *const c_char {
+    let json = serde_json::to_string(s).unwrap();
+    let json_c = CString::new(json).unwrap();
+    let json_ptr = json_c.as_ptr();
+    mem::forget(json_c);
+    json_ptr
+}
+
 fn gen_simple<C, FC>(difficulty: i32, constraint_cons: FC) -> *const c_char
 where
     C: Constraint + Clone + Into<AnyConstraint> + Send + Serialize + 'static,
@@ -359,11 +369,7 @@ where
     let constraint: AnyConstraint = constraint.into();
     let sudoku = Sudoku::new_with_grid(grid, constraint);
 
-    let json = serde_json::to_string(&sudoku).unwrap();
-    let json_c = CString::new(json).unwrap();
-    let json_ptr = json_c.as_ptr();
-    mem::forget(json_c);
-    json_ptr
+    to_json_for_return(&sudoku)
 }
 
 /// Generates a 9x9 Sudoku with the provided constraint and difficulty and
@@ -394,11 +400,11 @@ pub extern fn gen(constraint: i32, difficulty: i32) -> *const c_char {
 /// * `constraint`: A identifier for the constraint that is used. For valid
 /// values, please refer to the crate-level documentation.
 #[no_mangle]
-pub extern fn check(json: *const c_char) -> u8 {
+pub extern fn check(json: *const c_char) -> *const c_char {
     let json = unsafe { CStr::from_ptr(json) }.to_str().unwrap();
     let sudoku: Sudoku<AnyConstraint> = serde_json::from_str(json).unwrap();
 
-    if sudoku.is_valid() { 1 } else { 0 }
+    to_json_for_return(&CheckResponse::from_sudoku(&sudoku))
 }
 
 /// Returns 42. For tests that the library was loaded correctly.

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Sudoverse.Util;
 using System;
 using System.Collections.Generic;
 
@@ -128,12 +129,12 @@ namespace Sudoverse.SudokuModel
         public static SudokuCell ParseJson(JToken token, PencilmarkType pencilmarkType)
         {
             if (!(token is JObject jobject))
-                throw new ParseSudokuException();
+                throw new ParseJsonException();
 
             var lockedValue = jobject.GetField<JValue>("locked");
 
             if (lockedValue.Type != JTokenType.Boolean)
-                throw new ParseSudokuException();
+                throw new ParseJsonException();
 
             var locked = (bool)lockedValue;
             var digit = jobject.GetField<JValue>("digit").ToInt();
