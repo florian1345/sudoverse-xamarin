@@ -47,7 +47,7 @@ namespace Sudoverse.UWP
             }
 #endif
 
-            SudokuEngineProvider.Engine = new UwpSudokuEngine();
+            SudokuEngineProvider.SetEngine(new UwpSudokuEngine());
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,

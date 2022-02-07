@@ -4,22 +4,14 @@ namespace Sudoverse.Engine
 {
     public static class SudokuEngineProvider
     {
-        private static ISudokuEngine engine;
+        public static EngineWrapper Engine { get; private set; }
 
-        public static ISudokuEngine Engine
+        public static void SetEngine(ISudokuEngine engine)
         {
-            get
-            {
-                return engine;
-            }
+            if (Engine != null)
+                throw new InvalidOperationException("Engine is already set.");
 
-            set
-            {
-                if (engine != null)
-                    throw new Exception("Engine has already been set.");
-
-                engine = value;
-            }
+            Engine = new EngineWrapper(engine);
         }
     }
 }

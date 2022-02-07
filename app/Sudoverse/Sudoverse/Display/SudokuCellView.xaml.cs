@@ -1,5 +1,4 @@
 ﻿using Sudoverse.SudokuModel;
-using System.Linq;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -15,6 +14,7 @@ namespace Sudoverse.Display
 
         private static readonly Color SelectedColor = Color.FromRgba(0, 0, 1, 0.1);
         private static readonly Color UnselectedColor = Color.Transparent;
+        private static readonly Color InvalidColor = Color.FromRgba(1, 0, 0, 0.1);
 
         private double fontSize;
         private SudokuCell cell;
@@ -81,6 +81,11 @@ namespace Sudoverse.Display
         public void Deselect()
         {
             Background.Color = UnselectedColor;
+        }
+
+        public void SetInvalid()
+        {
+            Background.Color = InvalidColor;
         }
 
         public void SetFontSize(double fontSize)

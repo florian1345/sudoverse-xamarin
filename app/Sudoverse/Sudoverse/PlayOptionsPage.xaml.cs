@@ -95,9 +95,10 @@ namespace Sudoverse
 
         private void OnStart(object sender, EventArgs e)
         {
+            int constraint = selectedRuleConfig.ConstraintId;
             int difficulty = DifficultySlider.Difficulty;
-            string json = SudokuEngineProvider.Engine.Gen(selectedRuleConfig.ConstraintId, difficulty);
-            var sudoku = Sudoku.ParseJson(json, Config.PencilmarkType);
+            var pencilmarkType = Config.PencilmarkType;
+            var sudoku = SudokuEngineProvider.Engine.Gen(constraint, difficulty, pencilmarkType);
             App.Current.MainPage = new PlayPage(sudoku);
         }
     }

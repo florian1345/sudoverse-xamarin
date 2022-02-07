@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sudoverse.Constraint;
+using Sudoverse.Util;
 using System;
 using System.Linq;
 
@@ -137,10 +138,10 @@ namespace Sudoverse.SudokuModel
             var sudokuToken = JToken.Parse(json);
 
             if (!(sudokuToken is JObject sudokuObject))
-                throw new ParseSudokuException();
+                throw new ParseJsonException();
 
             if (!sudokuObject.TryGetValue("constraint", out JToken constraintToken))
-                throw new ParseSudokuException();
+                throw new ParseJsonException();
 
             var constraint = ConstraintUtil.FromJson(constraintToken);
             var grid = sudokuObject.GetField<JObject>("grid");
@@ -152,7 +153,7 @@ namespace Sudoverse.SudokuModel
                 var idValue = sudokuObject.GetField<JValue>("pencilmark_type");
 
                 if (idValue.Type != JTokenType.String)
-                    throw new ParseSudokuException();
+                    throw new ParseJsonException();
 
                 pencilmarkType = PencilmarkType.FromIdentifier((string)idValue);
             }
@@ -168,7 +169,7 @@ namespace Sudoverse.SudokuModel
             }
 
             if (cells.Length != result.cells.Length)
-                throw new ParseSudokuException();
+                throw new ParseJsonException();
 
             result.cells = cells;
             return result;

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Sudoverse.Util;
 
 namespace Sudoverse.SudokuModel
 {
@@ -63,7 +64,7 @@ namespace Sudoverse.SudokuModel
 
         /// <summary>
         /// Returns the appropriate pencilmark type for the given identifier, or throws a
-        /// <see cref="ParseSudokuException"/> if there is none.
+        /// <see cref="ParseJsonException"/> if there is none.
         /// </summary>
         public static PencilmarkType FromIdentifier(string identifier)
         {
@@ -71,7 +72,7 @@ namespace Sudoverse.SudokuModel
             {
                 case CenterBorderPencilmarkTypeImpl.IDENTIFIER: return CenterBorderPencilmarkType;
                 case PositionalPencilmarkTypeImpl.IDENTIFIER: return PositionalPencilmarkType;
-                default: throw new ParseSudokuException();
+                default: throw new ParseJsonException();
             }
         }
     }

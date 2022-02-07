@@ -13,6 +13,6 @@ namespace Engine
         public static extern string Gen(int constraint, int difficulty);
 
         [DllImport(DllName, EntryPoint = "check")]
-        public static extern byte Check(string json);
+        public static extern string Check(string json);
     }
 }

@@ -201,9 +201,9 @@ namespace Sudoverse
 
 		private void OnCheck(object sender, EventArgs e)
 		{
-			string json = sudokuView.Sudoku.ToJson();
+			var checkResponse = SudokuEngineProvider.Engine.Check(sudokuView.Sudoku);
 			
-			if (SudokuEngineProvider.Engine.Check(json))
+			if (checkResponse.Valid)
 			{
 				if (sudokuView.Sudoku.Full)
 				{
@@ -215,6 +215,7 @@ namespace Sudoverse
             }
 			else
             {
+				sudokuView.MarkInvalid(checkResponse.InvalidCells);
 				DisplayAlert("Check", "Not correct.", "Ok");
 			}
 		}
