@@ -9,6 +9,7 @@
 //! * `1` for diagonals Sudoku
 //! * `2` for knight's move Sudoku
 //! * `3` for king's move Sudoku
+//! * `4` for Chess Sudoku (knight's move + king's move)
 
 use crate::check_response::CheckResponse;
 use crate::constraint::AnyConstraint;
@@ -194,6 +195,10 @@ type DefaultKnightsMoveConstraint =
     CompositeConstraint<DefaultConstraint, KnightsMoveConstraint>;
 type DefaultKingsMoveConstraint =
     CompositeConstraint<DefaultConstraint, DiagonallyAdjacentConstraint>;
+type DefaultChessConstraint =
+    CompositeConstraint<DefaultConstraint,
+        CompositeConstraint<KnightsMoveConstraint,
+            DiagonallyAdjacentConstraint>>;
 
 fn default_constraint() -> DefaultConstraint {
     DefaultConstraint
@@ -217,6 +222,16 @@ fn kings_move_constraint() -> DefaultKingsMoveConstraint {
     CompositeConstraint::new(
         DefaultConstraint,
         DiagonallyAdjacentConstraint
+    )
+}
+
+fn chess_constraint() -> DefaultChessConstraint {
+    CompositeConstraint::new(
+        DefaultConstraint,
+        CompositeConstraint::new(
+            KnightsMoveConstraint,
+            DiagonallyAdjacentConstraint
+        )
     )
 }
 
@@ -388,6 +403,7 @@ pub extern fn gen(constraint: i32, difficulty: i32) -> *const c_char {
         1 => gen_simple(difficulty, diagonals_constraint),
         2 => gen_simple(difficulty, knights_move_constraint),
         3 => gen_simple(difficulty, kings_move_constraint),
+        4 => gen_simple(difficulty, chess_constraint),
         _ => panic!("Invalid constraint identifier: {}", constraint)
     }
 }

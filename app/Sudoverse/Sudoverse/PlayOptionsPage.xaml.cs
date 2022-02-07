@@ -1,7 +1,5 @@
-﻿using Sudoverse.Constraint;
-using Sudoverse.Display;
+﻿using Sudoverse.Display;
 using Sudoverse.Engine;
-using Sudoverse.SudokuModel;
 
 using System;
 
@@ -35,14 +33,16 @@ namespace Sudoverse
             new RuleConfig("rules_classic.png", "Classic Sudoku",
                 "Each digit must appear exactly once in every row, column, and box.", 0),
             new RuleConfig("rules_diagonal.png", "Diagonals Sudoku",
-                "In addition to classic rules, each digit must appear exactly once on both diagonals.",
-                1),
+                "In addition to classic rules, each digit must appear exactly once on both " +
+                "diagonals.", 1),
             new RuleConfig("rules_knights_move.png", "Knight's Move Sudoku",
-                "In addition to classic rules, cells removed by a Chess knight's move must not contain the same digit.",
-                2),
+                "In addition to classic rules, cells removed by a Chess knight's move must not " +
+                "contain the same digit.", 2),
             new RuleConfig("rules_kings_move.png", "King's Move Sudoku",
-                "In addition to classic rules, diagonally adjacent cells must not contain the same digit.",
-                3)
+                "In addition to classic rules, diagonally adjacent cells must not contain the " +
+                "same digit.", 3),
+            new RuleConfig("rules_chess.png", "Chess Sudoku",
+                "A combination of Knight's Move and King's Move Sudoku.", 4)
         };
 
         // TODO find a more dynamic solution
