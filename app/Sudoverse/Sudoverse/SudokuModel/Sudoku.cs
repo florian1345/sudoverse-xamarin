@@ -53,6 +53,7 @@ namespace Sudoverse.SudokuModel
         {
             var cell = cells[row * Size + column];
             var oldDigit = cell.Digit;
+            var oldColor = cell.ColorIndex;
 
             if (cell.Enter(digit, notation))
             {
@@ -62,6 +63,8 @@ namespace Sudoverse.SudokuModel
                         if (oldDigit == 0)
                             return new ClearOperation(column, row);
                         else return new EnterOperation(column, row, oldDigit, notation);
+                    case Notation.Color:
+                        return new EnterOperation(column, row, oldColor, notation);
                     default: return new EnterOperation(column, row, digit, notation);
                 }
             }

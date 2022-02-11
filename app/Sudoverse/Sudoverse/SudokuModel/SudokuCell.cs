@@ -10,6 +10,10 @@ namespace Sudoverse.SudokuModel
     /// </summary>
     public sealed class SudokuCell
     {
+        /// <summary>
+        /// Raised whenever the content of this cell, i.e. its <see cref="Digit"/>, its
+        /// <see cref="Pencilmark"/>, or its <see cref="ColorIndex"/> change in any way.
+        /// </summary>
         public event EventHandler Updated;
 
         /// <summary>
@@ -34,6 +38,11 @@ namespace Sudoverse.SudokuModel
         public IPencilmark Pencilmark { get; }
 
         /// <summary>
+        /// The 1-based index of the background color of this cell.
+        /// </summary>
+        public int ColorIndex { get; private set; }
+
+        /// <summary>
         /// Creates a new, empty Sudoku cell with the given pencilmark.
         /// </summary>
         public SudokuCell(IPencilmark pencilmark)
@@ -47,6 +56,7 @@ namespace Sudoverse.SudokuModel
         {
             Digit = digit;
             Pencilmark = pencilmark;
+            ColorIndex = 1;
 
             if (digit > 0)
                 Locked = true;
@@ -93,6 +103,18 @@ namespace Sudoverse.SudokuModel
         /// </summary>
         public bool Enter(int digit, Notation notation)
         {
+            if (notation == Notation.Color)
+            {
+                if (ColorIndex != digit)
+                {
+                    ColorIndex = digit;
+                    Updated?.Invoke(this, new EventArgs());
+                    return true;
+                }
+                else return false;
+
+            }
+
             if (Locked) return false;
 
             if (notation == Notation.Normal)
@@ -122,7 +144,8 @@ namespace Sudoverse.SudokuModel
             {
                 { "locked", Locked },
                 { "digit", Digit },
-                { "pencilmark", pencilmark }
+                { "pencilmark", pencilmark },
+                { "color", ColorIndex }
             };
         }
         
@@ -139,11 +162,13 @@ namespace Sudoverse.SudokuModel
             var locked = (bool)lockedValue;
             var digit = jobject.GetField<JValue>("digit").ToInt();
             var pencilmark = pencilmarkType.FromJson(jobject.GetValue("pencilmark"));
+            var colorIndex = jobject.GetField<JValue>("color").ToInt();
 
             return new SudokuCell(pencilmark)
             {
                 Digit = digit,
-                Locked = locked
+                Locked = locked,
+                ColorIndex = colorIndex
             };
         }
     }

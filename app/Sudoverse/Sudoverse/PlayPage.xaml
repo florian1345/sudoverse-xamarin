@@ -20,6 +20,7 @@
                 BorderWidth="5" />
 
             <Button
+                x:Name="ButtonDigit1"
                 Text="1"
                 FontAttributes="Bold"
                 Clicked="OnOne"
@@ -28,6 +29,7 @@
                 Grid.Column="1" />
 
             <Button
+                x:Name="ButtonDigit2"
                 Text="2"
                 FontAttributes="Bold"
                 Clicked="OnTwo"
@@ -36,6 +38,7 @@
                 Grid.Column="2" />
 
             <Button
+                x:Name="ButtonDigit3"
                 Text="3"
                 FontAttributes="Bold"
                 Clicked="OnThree"
@@ -52,6 +55,7 @@
                 BorderWidth="5" />
 
             <Button
+                x:Name="ButtonDigit4"
                 Text="4"
                 FontAttributes="Bold"
                 Clicked="OnFour"
@@ -60,6 +64,7 @@
                 Grid.Column="1" />
 
             <Button
+                x:Name="ButtonDigit5"
                 Text="5"
                 FontAttributes="Bold"
                 Clicked="OnFive"
@@ -68,6 +73,7 @@
                 Grid.Column="2" />
 
             <Button
+                x:Name="ButtonDigit6"
                 Text="6"
                 FontAttributes="Bold"
                 Clicked="OnSix"
@@ -84,6 +90,7 @@
                 BorderWidth="5" />
 
             <Button
+                x:Name="ButtonDigit7"
                 Text="7"
                 FontAttributes="Bold"
                 Clicked="OnSeven"
@@ -92,6 +99,7 @@
                 Grid.Column="1" />
 
             <Button
+                x:Name="ButtonDigit8"
                 Text="8"
                 FontAttributes="Bold"
                 Clicked="OnEight"
@@ -100,6 +108,7 @@
                 Grid.Column="2" />
 
             <Button
+                x:Name="ButtonDigit9"
                 Text="9"
                 FontAttributes="Bold"
                 Clicked="OnNine"
@@ -107,14 +116,21 @@
                 Grid.Row="2"
                 Grid.Column="3" />
 
+            <ImageButton
+                x:Name="ButtonNotation3"
+                Source="notation_color.png"
+                Grid.Row="3"
+                Grid.Column="0"
+                Clicked="OnNotation3"
+                BorderWidth="5" />
+            
             <Button
-                Text="Clear"
+                Text="⨂"
                 FontAttributes="Bold"
                 Clicked="OnClear"
                 HorizontalOptions="Fill"
                 Grid.Row="3"
-                Grid.Column="0"
-                Grid.ColumnSpan="2" />
+                Grid.Column="1" />
 
             <Button
                 Text="⤺"
