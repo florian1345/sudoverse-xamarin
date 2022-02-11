@@ -113,6 +113,7 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Images\notation_color.png" />
     <Content Include="Assets\Images\notation_corner.png" />
     <Content Include="Assets\Images\notation_normal.png" />
     <Content Include="Assets\Images\notation_positional.png" />

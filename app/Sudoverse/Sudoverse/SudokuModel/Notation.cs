@@ -13,6 +13,12 @@
         Normal,
 
         /// <summary>
+        /// "Color" notation, which does not print any numbers per-se into the cell, but rather
+        /// alters its background color. It can be used with all pencilmark types.
+        /// </summary>
+        Color,
+
+        /// <summary>
         /// "Center" notation, i.e. a group of small digits in the center of the cell. Used in the
         /// <see cref="CenterBorderPencilmark"/>.
         /// </summary>

@@ -32,6 +32,7 @@ namespace Sudoverse
 			ButtonNotationNormal.BorderColor = NotationButtonSelectedBackground;
 			ButtonNotation1.BorderColor = NotationButtonUnselectedBackground;
 			ButtonNotation2.BorderColor = NotationButtonUnselectedBackground;
+			ButtonNotation3.BorderColor = NotationButtonUnselectedBackground;
 
 			undos = new DropOutStack<Operation>(UNDO_CAPACITY);
 			redos = new DropOutStack<Operation>(UNDO_CAPACITY);
@@ -64,6 +65,7 @@ namespace Sudoverse
 			UpdateNotationButton(ButtonNotationNormal, notation == Notation.Normal);
 			UpdateNotationButton(ButtonNotation1, notation == notation1);
 			UpdateNotationButton(ButtonNotation2, notation == Notation.Border);
+			UpdateNotationButton(ButtonNotation3, notation == Notation.Color);
 		}
 
 		private void PushUndo(Operation operation)
@@ -232,20 +234,67 @@ namespace Sudoverse
 			UpdateNotationButtons();
         }
 
+		private void SetButtonLabel(Button button, string text, Color color)
+		{
+			button.Text = text;
+			button.TextColor = color;
+		}
+
+		private void SetNumberLabels()
+        {
+			SetButtonLabel(ButtonDigit1, "1", Color.Default);
+			SetButtonLabel(ButtonDigit2, "2", Color.Default);
+			SetButtonLabel(ButtonDigit3, "3", Color.Default);
+			SetButtonLabel(ButtonDigit4, "4", Color.Default);
+			SetButtonLabel(ButtonDigit5, "5", Color.Default);
+			SetButtonLabel(ButtonDigit6, "6", Color.Default);
+			SetButtonLabel(ButtonDigit7, "7", Color.Default);
+			SetButtonLabel(ButtonDigit8, "8", Color.Default);
+			SetButtonLabel(ButtonDigit9, "9", Color.Default);
+		}
+
+		private void SetColorLabel(Button button, Color color)
+        {
+			var opaqueColor = color.A == 0.0 ? Color.White : Color.FromRgba(color.R, color.G, color.B, 1.0);
+			SetButtonLabel(button, "⬛", opaqueColor);
+        }
+
+		private void SetColorLabels()
+		{
+			SetColorLabel(ButtonDigit1, SudokuCellView.BackgroundColors[0]);
+			SetColorLabel(ButtonDigit2, SudokuCellView.BackgroundColors[1]);
+			SetColorLabel(ButtonDigit3, SudokuCellView.BackgroundColors[2]);
+			SetColorLabel(ButtonDigit4, SudokuCellView.BackgroundColors[3]);
+			SetColorLabel(ButtonDigit5, SudokuCellView.BackgroundColors[4]);
+			SetColorLabel(ButtonDigit6, SudokuCellView.BackgroundColors[5]);
+			SetColorLabel(ButtonDigit7, SudokuCellView.BackgroundColors[6]);
+			SetColorLabel(ButtonDigit8, SudokuCellView.BackgroundColors[7]);
+			SetColorLabel(ButtonDigit9, SudokuCellView.BackgroundColors[8]);
+		}
+
         private void OnNotationNormal(object sender, EventArgs e)
         {
 			SetNotation(Notation.Normal);
+			SetNumberLabels();
 		}
 
 		private void OnNotation1(object sender, EventArgs e)
 		{
 			SetNotation(notation1);
+			SetNumberLabels();
 		}
 
 		private void OnNotation2(object sender, EventArgs e)
 		{
 			SetNotation(Notation.Border);
+			SetNumberLabels();
 		}
+
+		private void OnNotation3(object sender, EventArgs e)
+        {
+			SetNotation(Notation.Color);
+			SetColorLabels();
+        }
 
 		private void Undo()
         {
