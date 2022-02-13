@@ -42,7 +42,10 @@ namespace Sudoverse
                 "In addition to classic rules, diagonally adjacent cells must not contain the " +
                 "same digit.", 3),
             new RuleConfig("rules_chess.png", "Chess Sudoku",
-                "A combination of Knight's Move and King's Move Sudoku.", 4)
+                "A combination of Knight's Move and King's Move Sudoku.", 4),
+            new RuleConfig("rules_sandwich.png", "Sandwich Sudoku",
+                "In addition to classic rules, digits located between 1 and 9 in their row or " +
+                "column must add to the number outside the grid.", 5)
         };
 
         // TODO find a more dynamic solution

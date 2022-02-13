@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Sudoverse.Display.FrameNumberView">
+    <ContentView.Content>
+        <AbsoluteLayout>
+            <Label
+                x:Name="LabelNumber"
+                AbsoluteLayout.LayoutBounds="0.5,0.5,1.0,1.0"
+                AbsoluteLayout.LayoutFlags="All"
+                FontFamily="DigitFont"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </AbsoluteLayout>
+    </ContentView.Content>
+</ContentView>

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sudoverse.Util;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xamarin.Forms;
@@ -28,10 +27,8 @@ namespace Sudoverse.Constraint
             return result.ToArray();
         }
 
-        public Frame GetFrame()
-        {
-            throw new NotImplementedException();
-        }
+        public FrameGroup GetFrames() =>
+            constraints.Select(c => c.GetFrames()).Aggregate(FrameGroup.Combine);
 
         public JToken ToJsonValue()
         {
@@ -46,7 +43,7 @@ namespace Sudoverse.Constraint
         public static IConstraint FromJsonValue(JToken token)
         {
             if (token.Type != JTokenType.Array)
-                throw new LoadConstraintException();
+                throw new ParseJsonException();
 
             var constraints = ((JArray)token).Select(t => ConstraintUtil.FromJson(t))
                 .ToList();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Sudoverse.Util
 {
@@ -30,6 +31,24 @@ namespace Sudoverse.Util
             Array.Copy(a, 0, result, 0, a.Length);
             Array.Copy(b, 0, result, a.Length, b.Length);
             return result;
+        }
+
+        /// <summary>
+        /// Gets the element at the given index, or <tt>null</tt> of there is no such element.
+        /// </summary>
+        /// <typeparam name="T">The element type of the list.</typeparam>
+        /// <param name="ts">The list to search.</param>
+        /// <param name="index">The index at which to search.</param>
+        /// <returns>The element at the given index, if it is present, and <tt>null</tt> otherwise.
+        /// </returns>
+        public static T GetOrNull<T>(this IList<T> ts, int index)
+        where
+            T: class
+        {
+            if (index < 0 || index >= ts.Count)
+                return null;
+
+            return ts[index];
         }
     }
 }

@@ -32,15 +32,17 @@ namespace Sudoverse.Util
             return t;
         }
 
-        public static int ToInt(this JToken token)
+        public static int ToInt(this JToken token, int nullValue)
         {
             if (token.Type == JTokenType.Integer)
                 return (int)token;
 
             if (token.Type == JTokenType.Null)
-                return 0;
+                return nullValue;
 
             throw new ParseJsonException(token.Type, JTokenType.Integer, JTokenType.Null);
         }
+
+        public static int ToInt(this JToken token) => token.ToInt(0);
     }
 }

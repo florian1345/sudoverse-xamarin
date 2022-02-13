@@ -1,4 +1,5 @@
-﻿using Sudoverse.SudokuModel;
+﻿using Sudoverse.Constraint;
+using Sudoverse.SudokuModel;
 using Sudoverse.Touch;
 using Sudoverse.Util;
 using System;
@@ -23,8 +24,14 @@ namespace Sudoverse.Display
         private const double THICK_STROKE_WIDTH_FACTOR = 0.06;
         private const double THIN_STROKE_WIDTH_FACTOR = 0.03;
 
-        public Sudoku Sudoku { get; private set; }
+        public Sudoku Sudoku { get; }
 
+        /// <summary>
+        /// The required aspect ratio of this view as Width / Height.
+        /// </summary>
+        public double AspectRatio { get; }
+
+        private FrameGroup frames;
         private SudokuCellView[,] cells;
         private Line[] horizontalLines;
         private Line[] verticalLines;
@@ -38,6 +45,12 @@ namespace Sudoverse.Display
         public SudokuView(Sudoku sudoku) : base()
         {
             Sudoku = sudoku;
+            frames = Sudoku.Constraint.GetFrames();
+
+            int widthCells = Sudoku.Size + frames.LeftSpace + frames.RightSpace;
+            int heightCells = Sudoku.Size + frames.TopSpace + frames.BottomSpace;
+
+            AspectRatio = (double)widthCells / heightCells;
             cells = new SudokuCellView[Sudoku.Size, Sudoku.Size];
 
             for (int row = 0; row < Sudoku.Size; row++)
@@ -75,6 +88,19 @@ namespace Sudoverse.Display
                 Children.Add(verticalLine);
             }
 
+            foreach (var frame in frames)
+            {
+                AddChildIfNotNull(frame.TopLeftCorner);
+                AddChildIfNotNull(frame.TopRightCorner);
+                AddChildIfNotNull(frame.BottomLeftCorner);
+                AddChildIfNotNull(frame.BottomRightCorner);
+
+                AddChildrenIfNotNull(frame.TopLine);
+                AddChildrenIfNotNull(frame.LeftLine);
+                AddChildrenIfNotNull(frame.RightLine);
+                AddChildrenIfNotNull(frame.BottomLine);
+            }
+
             selected = new HashSet<(int, int)>();
             var effect = new TouchEffect();
             effect.TouchAction += OnTouchAction;
@@ -82,6 +108,18 @@ namespace Sudoverse.Display
             mouseDown = false;
             ShiftDown = new SharedFlag();
             ControlDown = new SharedFlag();
+        }
+
+        private void AddChildIfNotNull(View view)
+        {
+            if (view != null)
+                Children.Add(view);
+        }
+
+        private void AddChildrenIfNotNull(IEnumerable<View> views)
+        {
+            foreach (var view in views)
+                AddChildIfNotNull(view);
         }
 
         private int FindCellCoordinate(double pointCoordinate, Func<int, double> lineCoordinateGetter)
@@ -279,11 +317,16 @@ namespace Sudoverse.Display
             markedInvalid = invalidCells;
         }
 
-        protected override void LayoutChildren(double x, double y, double width, double height)
+        private void LayoutChild(View child, double x, double y, double w, double h)
         {
-            // We simply assume that width == height, it should always be like that
+            if (child == null) return;
 
-            double cellSize = width / Sudoku.Size;
+            var rect = new Xamarin.Forms.Rectangle(x, y, w, h);
+            LayoutChildIntoBoundingRegion(child, rect);
+        }
+
+        private void LayoutSudoku(double x, double y, double width, double height, double cellSize)
+        {
             double fontSize = cellSize * FONT_SIZE_FACTOR;
 
             for (int row = 0; row < Sudoku.Size; row++)
@@ -292,10 +335,9 @@ namespace Sudoverse.Display
                 {
                     double cellX = x + cellSize * column;
                     double cellY = y + cellSize * row;
-                    var rect = new Xamarin.Forms.Rectangle(cellX, cellY, cellSize, cellSize);
                     var view = cells[column, row];
                     view.SetFontSize(fontSize);
-                    LayoutChildIntoBoundingRegion(view, rect);
+                    LayoutChild(view, cellX, cellY, cellSize, cellSize);
                 }
             }
 
@@ -306,20 +348,8 @@ namespace Sudoverse.Display
             {
                 double hlineY = y + cellSize * i;
                 double hlineStrokeWidth = i % Sudoku.BlockHeight == 0 ? thickStrokeWidth : thinStrokeWidth;
-                var hlineRect = new Xamarin.Forms.Rectangle(
-                    x - 0.5 * hlineStrokeWidth,
-                    hlineY - 0.5 * hlineStrokeWidth,
-                    hlineStrokeWidth + width,
-                    hlineStrokeWidth
-                );
                 double vlineX = x + cellSize * i;
                 double vlineStrokeWidth = i % Sudoku.BlockWidth == 0 ? thickStrokeWidth : thinStrokeWidth;
-                var vlineRect = new Xamarin.Forms.Rectangle(
-                    vlineX - 0.5 * vlineStrokeWidth,
-                    y - 0.5 * vlineStrokeWidth,
-                    vlineStrokeWidth,
-                    vlineStrokeWidth + height
-                );
 
                 var hline = horizontalLines[i];
                 hline.X1 = 0;
@@ -327,7 +357,11 @@ namespace Sudoverse.Display
                 hline.Y1 = 0;
                 hline.Y2 = 0;
                 hline.StrokeThickness = hlineStrokeWidth;
-                LayoutChildIntoBoundingRegion(hline, hlineRect);
+                LayoutChild(hline,
+                    x - 0.5 * hlineStrokeWidth,
+                    hlineY - 0.5 * hlineStrokeWidth,
+                    hlineStrokeWidth + width,
+                    hlineStrokeWidth);
 
                 var vline = verticalLines[i];
                 vline.X1 = 0;
@@ -335,7 +369,61 @@ namespace Sudoverse.Display
                 vline.Y1 = 0;
                 vline.Y2 = height;
                 vline.StrokeThickness = vlineStrokeWidth;
-                LayoutChildIntoBoundingRegion(vline, vlineRect);
+                LayoutChild(vline,
+                    vlineX - 0.5 * vlineStrokeWidth,
+                    y - 0.5 * vlineStrokeWidth,
+                    vlineStrokeWidth,
+                    vlineStrokeWidth + height);
+            }
+        }
+
+        protected override void LayoutChildren(double x, double y, double width, double height)
+        {
+            // We simply assume that the aspect ratio is respected, it should always be like that
+
+            double cellSize = width / (Sudoku.Size + frames.LeftSpace + frames.RightSpace);
+
+            double sudokuX = x + cellSize * frames.LeftSpace;
+            double sudokuY = y + cellSize * frames.TopSpace;
+            double sudokuSize = cellSize * Sudoku.Size;
+
+            LayoutSudoku(sudokuX, sudokuY, sudokuSize, sudokuSize, cellSize);
+
+            double topY = sudokuY - cellSize;
+            double leftX = sudokuX - cellSize;
+            double rightX = sudokuX + sudokuSize;
+            double bottomY = sudokuY + sudokuSize;
+
+            foreach (var frame in frames)
+            {
+                LayoutChild(frame.TopLeftCorner, leftX, topY, cellSize, cellSize);
+                LayoutChild(frame.TopRightCorner, rightX, topY, cellSize, cellSize);
+                LayoutChild(frame.BottomLeftCorner, leftX, bottomY, cellSize, cellSize);
+                LayoutChild(frame.BottomRightCorner, rightX, bottomY, cellSize, cellSize);
+
+                for (int i = 0; i < Sudoku.Size; i++)
+                {
+                    LayoutChild(frame.TopLine.GetOrNull(i),
+                        sudokuX + i * cellSize, topY, cellSize, cellSize);
+                    LayoutChild(frame.LeftLine.GetOrNull(i),
+                        leftX, sudokuY + i * cellSize, cellSize, cellSize);
+                    LayoutChild(frame.RightLine.GetOrNull(i),
+                        rightX, sudokuY + i * cellSize, cellSize, cellSize);
+                    LayoutChild(frame.BottomLine.GetOrNull(i),
+                        sudokuX + i * cellSize, bottomY, cellSize, cellSize);
+                }
+
+                if (frame.RequiresTopSpace)
+                    topY -= cellSize;
+
+                if (frame.RequiresLeftSpace)
+                    leftX -= cellSize;
+
+                if (frame.RequiresRightSpace)
+                    rightX += cellSize;
+
+                if (frame.RequiresBottomSpace)
+                    bottomY += cellSize;
             }
         }
     }
