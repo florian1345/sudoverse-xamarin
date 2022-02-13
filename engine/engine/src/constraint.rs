@@ -9,10 +9,13 @@ use sudoku_variants::constraint::{
     DiagonalsConstraint,
     Group,
     KnightsMoveConstraint,
-    ReductionError
+    ReductionError,
+    SandwichConstraint
 };
+use sudoku_variants::constraint::sandwich::SandwichReduction;
 
 pub(crate) enum AnyReduction {
+    Sandwich(SandwichReduction),
     Composite {
         index: usize,
         reduction: Box<AnyReduction>
@@ -20,6 +23,7 @@ pub(crate) enum AnyReduction {
 }
 
 pub(crate) enum AnyRevertInfo {
+    Sandwich(usize),
     Composite {
         index: usize,
         revert_info: Box<AnyRevertInfo>
@@ -42,6 +46,9 @@ pub(crate) enum AnyConstraint {
     #[serde(rename = "kings-move")]
     KingsMove,
 
+    #[serde(rename = "sandwich")]
+    Sandwich(SandwichConstraint),
+
     #[serde(rename = "composite")]
     Composite(Vec<AnyConstraint>)
 }
@@ -58,6 +65,7 @@ impl Constraint for AnyConstraint {
             AnyConstraint::KnightsMove => KnightsMoveConstraint.check(grid),
             AnyConstraint::KingsMove =>
                 DiagonallyAdjacentConstraint.check(grid),
+            AnyConstraint::Sandwich(c) => c.check(grid),
             AnyConstraint::Composite(cs) =>
                 cs.iter().all(|c| c.check(grid))
         }
@@ -74,6 +82,7 @@ impl Constraint for AnyConstraint {
                 KnightsMoveConstraint.check_cell(grid, column, row),
             AnyConstraint::KingsMove =>
                 DiagonallyAdjacentConstraint.check_cell(grid, column, row),
+            AnyConstraint::Sandwich(c) => c.check_cell(grid, column, row),
             AnyConstraint::Composite(cs) =>
                 cs.iter().all(|c| c.check_cell(grid, column, row))
         }
@@ -91,6 +100,8 @@ impl Constraint for AnyConstraint {
             AnyConstraint::KingsMove =>
                 DiagonallyAdjacentConstraint.check_number(
                     grid, column, row, number),
+            AnyConstraint::Sandwich(c) =>
+                c.check_number(grid, column, row, number),
             AnyConstraint::Composite(cs) =>
                 cs.iter().all(|c| c.check_number(grid, column, row, number))
         }
@@ -104,6 +115,7 @@ impl Constraint for AnyConstraint {
                 KnightsMoveConstraint.get_groups(grid),
             AnyConstraint::KingsMove =>
                 DiagonallyAdjacentConstraint.get_groups(grid),
+            AnyConstraint::Sandwich(c) => c.get_groups(grid),
             AnyConstraint::Composite(cs) =>
                 cs.iter()
                     .flat_map(|c| c.get_groups(grid).into_iter())
@@ -117,6 +129,10 @@ impl Constraint for AnyConstraint {
             AnyConstraint::Diagonals => vec![],
             AnyConstraint::KnightsMove => vec![],
             AnyConstraint::KingsMove => vec![],
+            AnyConstraint::Sandwich(c) =>
+                c.list_reductions(solution).into_iter()
+                    .map(|r| AnyReduction::Sandwich(r))
+                    .collect(),
             AnyConstraint::Composite(cs) =>
                 cs.iter().enumerate()
                     .flat_map(|(i, c)| c.list_reductions(solution).into_iter()
@@ -135,6 +151,13 @@ impl Constraint for AnyConstraint {
             AnyConstraint::Diagonals => Err(ReductionError::InvalidReduction),
             AnyConstraint::KnightsMove => Err(ReductionError::InvalidReduction),
             AnyConstraint::KingsMove => Err(ReductionError::InvalidReduction),
+            AnyConstraint::Sandwich(c) =>
+                match reduction {
+                    AnyReduction::Sandwich(reduction) =>
+                        Ok(AnyRevertInfo::Sandwich(
+                            c.reduce(solution, reduction)?)),
+                    _ => panic!("invalid reduce")
+                }
             AnyConstraint::Composite(cs) => {
                 match reduction {
                     AnyReduction::Composite { index, reduction } => {
@@ -148,6 +171,7 @@ impl Constraint for AnyConstraint {
                         };
                         Ok(revert_info)
                     }
+                    _ => panic!("invalid reduce")
                 }
             }
         }
@@ -160,6 +184,14 @@ impl Constraint for AnyConstraint {
             AnyConstraint::Diagonals => panic!("invalid revert"),
             AnyConstraint::KnightsMove => panic!("invalid revert"),
             AnyConstraint::KingsMove => panic!("invalid revert"),
+            AnyConstraint::Sandwich(c) =>
+                match (reduction, revert_info) {
+                    (
+                        AnyReduction::Sandwich(reduction),
+                        AnyRevertInfo::Sandwich(revert_info)
+                    ) => c.revert(solution, reduction, revert_info),
+                    _ => panic!("invalid revert")
+                }
             AnyConstraint::Composite(cs) => {
                 match (reduction, revert_info) {
                     (AnyReduction::Composite {
@@ -177,7 +209,8 @@ impl Constraint for AnyConstraint {
                         let constraint = cs.get_mut(index)
                             .unwrap_or_else(|| panic!("invalid revert"));
                         constraint.revert(solution, reduction, *revert_info);
-                    }
+                    },
+                    _ => panic!("invalid revert")
                 }
             }
         }
@@ -205,6 +238,12 @@ impl From<KnightsMoveConstraint> for AnyConstraint {
 impl From<DiagonallyAdjacentConstraint> for AnyConstraint {
     fn from(_: DiagonallyAdjacentConstraint) -> AnyConstraint {
         AnyConstraint::KingsMove
+    }
+}
+
+impl From<SandwichConstraint> for AnyConstraint {
+    fn from(c: SandwichConstraint) -> AnyConstraint {
+        AnyConstraint::Sandwich(c)
     }
 }
 

@@ -1,0 +1,94 @@
+﻿using Newtonsoft.Json.Linq;
+
+using Sudoverse.Display;
+using Sudoverse.Util;
+
+using System.Linq;
+
+using Xamarin.Forms;
+
+namespace Sudoverse.Constraint
+{
+    /// <summary>
+    /// A constraint which provides numbers above and to the left of the grid which specify the sum
+    /// of all cells located between 1 and 9 in their respective column or row (1 and 9 excluded).
+    /// </summary>
+    public sealed class SandwichConstraint : IConstraint
+    {
+        private int[] columnSandwiches;
+        private int[] rowSandwiches;
+
+        public string Type => "sandwich";
+
+        private SandwichConstraint(int[] columnSandwiches, int[] rowSandwiches)
+        {
+            this.columnSandwiches = columnSandwiches;
+            this.rowSandwiches = rowSandwiches;
+        }
+
+        public View[] GetBackgroundViews(ReadOnlyMatrix<ReadOnlyRect> fieldBounds) =>
+            new View[0];
+
+        private View ToFrameView(int sandwich)
+        {
+            if (sandwich > 0)
+            {
+                var view = new FrameNumberView();
+                view.DisplayNumber(sandwich);
+                return view;
+            }
+            else return null;
+        }
+
+        private View[] ToFrameLine(int[] sandwiches) =>
+            sandwiches.Select(ToFrameView).ToArray();
+
+        public FrameGroup GetFrames() =>
+            FrameGroup.Singleton(new Frame.Builder()
+                .WithTopLine(ToFrameLine(columnSandwiches))
+                .WithLeftLine(ToFrameLine(rowSandwiches))
+                .Build());
+
+        private JArray ToJArray(int[] array)
+        {
+            var jarray = new JArray();
+
+            foreach (int i in array)
+                jarray.Add(i >= 0 ? (JValue)i : null);
+
+            return jarray;
+        }
+
+        public JToken ToJsonValue()
+        {
+            return new JObject()
+            {
+                { "columns", ToJArray(columnSandwiches) },
+                { "rows", ToJArray(rowSandwiches) }
+            };
+        }
+
+        private static int[] ToIntArray(JArray jarray)
+        {
+            int[] intArray = new int[jarray.Count];
+
+            for (int i = 0; i < jarray.Count; i++)
+            {
+                intArray[i] = jarray[i].ToInt(-1);
+            }
+
+            return intArray;
+        }
+
+        public static SandwichConstraint FromJsonValue(JToken token)
+        {
+            if (!(token is JObject jobject))
+                throw new ParseJsonException(token.Type, JTokenType.Object);
+
+            var columnSandwiches = ToIntArray(jobject.GetField<JArray>("columns"));
+            var rowSandwiches = ToIntArray(jobject.GetField<JArray>("rows"));
+
+            return new SandwichConstraint(columnSandwiches, rowSandwiches);
+        }
+    }
+}

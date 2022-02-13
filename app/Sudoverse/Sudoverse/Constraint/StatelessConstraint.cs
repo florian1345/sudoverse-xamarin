@@ -20,8 +20,8 @@ namespace Sudoverse.Constraint
         public View[] GetBackgroundViews(ReadOnlyMatrix<ReadOnlyRect> fieldBounds) =>
             new View[0];
 
-        public Frame GetFrame() =>
-            Frame.Empty();
+        public FrameGroup GetFrames() =>
+            FrameGroup.Empty();
 
         public JToken ToJsonValue() =>
             null;

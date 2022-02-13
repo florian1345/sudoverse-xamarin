@@ -75,19 +75,20 @@ namespace Sudoverse.Display
         }
 
         private void LayoutHorizontal(
-            double x, double y, double width, double height, View sudoku, IEnumerable<View> menu)
+            double x, double y, double width, double height, SudokuView sudoku, IEnumerable<View> menu)
         {
             double spacing = SPACING_FACTOR * Math.Min(width, height);
             double remainingWidth = width - 3 * spacing;
             double remainingHeight = height - 2 * spacing;
-            double sudokuSize = Math.Min(SUDOKU_SIZE_FACTOR * remainingWidth, remainingHeight);
-            double menuWidth = remainingWidth - sudokuSize;
+            double sudokuWidth = Math.Min(SUDOKU_SIZE_FACTOR * remainingWidth, sudoku.AspectRatio * remainingHeight);
+            double sudokuHeight = sudokuWidth / sudoku.AspectRatio;
+            double menuWidth = remainingWidth - sudokuWidth;
 
             double sudokuX = x + spacing;
-            double sudokuY = y + (height - sudokuSize) * 0.5;
-            LayoutChildIntoBoundingRegion(sudoku, new Rectangle(sudokuX, sudokuY, sudokuSize, sudokuSize));
+            double sudokuY = y + (height - sudokuHeight) * 0.5;
+            LayoutChildIntoBoundingRegion(sudoku, new Rectangle(sudokuX, sudokuY, sudokuWidth, sudokuHeight));
 
-            double elementX = x + sudokuSize + 2 * spacing;
+            double elementX = x + sudokuWidth + 2 * spacing;
             double elementY = spacing;
             double elementHeight = remainingHeight / menu.Count();
 
@@ -110,7 +111,7 @@ namespace Sudoverse.Display
             var sudoku = Children[0];
             var menu = Children.Skip(1);
 
-            if (width > height) LayoutHorizontal(x, y, width, height, sudoku, menu);
+            if (width > height) LayoutHorizontal(x, y, width, height, (SudokuView)sudoku, menu);
             else LayoutVertical(x, y, width, height, sudoku, menu);
         }
     }

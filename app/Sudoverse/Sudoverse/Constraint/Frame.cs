@@ -1,86 +1,32 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Xamarin.Forms;
 
 namespace Sudoverse.Constraint
 {
     /// <summary>
-    /// An enumeration of the different preferences with regards to placement a
-    /// <see cref="FrameLine"/> can have.
+    /// An enumeration of the different preferences with regards to placement a <see cref="Frame"/>
+    /// can have.
     /// </summary>
-    public enum FrameLinePlacementPreference
+    public enum FramePlacementPreference
     {
         /// <summary>
-        /// Place the line as close to the Sudoku grid as possible.
+        /// Place the frame as close to the Sudoku grid as possible.
         /// </summary>
-        Inner,
+        Inner = 0,
 
         /// <summary>
-        /// Place the line as far away from the Sudoku grid as possible.
+        /// Place the frame as far away from the Sudoku grid as possible.
         /// </summary>
-        Outer,
+        Outer = 2,
 
         /// <summary>
-        /// Place the line wherever fits best.
+        /// Place the frame wherever fits best.
         /// </summary>
-        NoPreference
-    }
-
-    /// <summary>
-    /// A line of information outside the grid, such as the sandwich clues in Sandwich Sudoku or
-    /// mini killer sums. This contains only information about one line, i.e. a column to the
-    /// left/right or a row at the top/bottom of the grid. The position itself is not stored within
-    /// this class.
-    ///
-    /// Multiple frame lines constitute a <see cref="Frame"/>.
-    /// </summary>
-    public sealed class FrameLine
-    {
-        /// <summary>
-        /// If this is true, the line requires a field on the corner outside the Sudoku grid, which
-        /// is placed at the lower coordinates in the direction of the line.
-        /// </summary>
-        public bool WithStartCorner { get; }
-
-        /// <summary>
-        /// If this is true, the line requires a field on the corner outside the Sudoku grid, which
-        /// is placed at the higher coordinates in the direction of the line.
-        /// </summary>
-        public bool WithEndCorner { get; }
-
-        /// <summary>
-        /// Indicates the preference this line has as to how close to the grid it should be placed.
-        /// </summary>
-        public FrameLinePlacementPreference PlacementPreference { get; }
-
-        /// <summary>
-        /// An array containing the Xamarin.Forms <see cref="View"/>s that constitute the frame
-        /// line. If any position should not have any view in it, its position is occupied by
-        /// <tt>null</tt> in this array.
-        /// </summary>
-        public ReadOnlyCollection<View> Views { get; }
-
-        /// <summary>
-        /// Creates a new frame line with the specified parameters.
-        /// </summary>
-        /// <param name="withStartCorner">If this is true, the line requires a field on the corner
-        /// outside the Sudoku grid, which s placed at the lower coordinates in the direction of
-        /// the line.</param>
-        /// <param name="withEndCorner">If this is true, the line requires a field on the corner
-        /// outside the Sudoku grid, which s placed at the higher coordinates in the direction of
-        /// the line.</param>
-        /// <param name="placementPreference">Indicates the preference this line has as to how
-        /// close to the grid it should be placed.</param>
-        /// <param name="views">An array containing the Xamarin.Forms <see cref="View"/>s that
-        /// constitute the frame line. If any position should not have any view in it,
-        /// <tt>null</tt> must occupy its position in this array.</param>
-        public FrameLine(bool withStartCorner, bool withEndCorner, FrameLinePlacementPreference placementPreference, View[] views)
-        {
-            WithStartCorner = withStartCorner;
-            WithEndCorner = withEndCorner;
-            PlacementPreference = placementPreference;
-            Views = Array.AsReadOnly(views);
-        }
+        NoPreference = 1
     }
 
     /// <summary>
@@ -94,8 +40,7 @@ namespace Sudoverse.Constraint
     }
 
     /// <summary>
-    /// An exception raised if the size of a frame line is invalid, that is, it would surround a
-    /// Sudoku of size 0 or less.
+    /// An exception raised if the size of a frame line is invalid, that is, it is less than 1.
     /// </summary>
     internal sealed class InvalidFrameLineSizeException : Exception
     {
@@ -114,44 +59,87 @@ namespace Sudoverse.Constraint
     }
 
     /// <summary>
-    /// An exception raised if at least two frame lines want to occupy the same corner, e.g. both
-    /// the left and top line want to have their starting corner (which would be the top-left
-    /// corner).
+    /// A frame around the Sudoku grid, which provides additional information, such as sandwich
+    /// clues in a Sandwich Sudoku or mini killer sums. A frame consists of up to four lines, each
+    /// containing a list of <see cref="View"/>s to put in that line. In addition, there are up to
+    /// four corners each containing one <see cref="View"/>.
     /// </summary>
-    internal sealed class FrameLineCollisionException : Exception
+    public sealed class Frame : IComparable<Frame>
     {
-        public FrameLineCollisionException()
-            : base("At least two frame lines collide in a corner.") { }
-    }
-
-    /// <summary>
-    /// A frame around the Sudoku grid, which provides additional information in
-    /// <see cref="FrameLine"/>s, such as sandwich clues in a Sandwich Sudoku or mini killer sums.
-    /// A frame consists of at most four frame lines - one to each side - but each side may or may
-    /// not have a line. In the other extreme, a frame can be empty, which is the default for any
-    /// constraint that does not have extra information to place outside the grid.
-    /// </summary>
-    public sealed class Frame
-    {
-        /// <summary>
-        /// The line to put on top of the grid or <tt>null</tt>, if there is no such line.
-        /// </summary>
-        public FrameLine TopLine { get; private set; } = null;
+        private View[] topLine;
+        private View[] leftLine;
+        private View[] rightLine;
+        private View[] bottomLine;
 
         /// <summary>
-        /// The line to put to the left of the grid or <tt>null</tt>, if there is no such line.
+        /// The line to put on top of the grid, from left to right. Empty if there is no such line.
         /// </summary>
-        public FrameLine LeftLine { get; private set; } = null;
+        public ReadOnlyCollection<View> TopLine => new ReadOnlyCollection<View>(topLine);
 
         /// <summary>
-        /// The line to put to the right of the grid or <tt>null</tt>, if there is no such line.
+        /// The line to put to the left of the grid, from top to bottom. Empty if there is no such
+        /// line.
         /// </summary>
-        public FrameLine RightLine { get; private set; } = null;
+        public ReadOnlyCollection<View> LeftLine => new ReadOnlyCollection<View>(leftLine);
 
         /// <summary>
-        /// The line to put below of the grid or <tt>null</tt>, if there is no such line.
+        /// The lines to put to the right of the grid, from top to bottom. Empty if there is no
+        /// such line.
         /// </summary>
-        public FrameLine BottomLine { get; private set; } = null;
+        public ReadOnlyCollection<View> RightLine => new ReadOnlyCollection<View>(rightLine);
+
+        /// <summary>
+        /// The lines to put below of the grid, from left to right. Empty if there is no such line.
+        /// </summary>
+        public ReadOnlyCollection<View> BottomLine => new ReadOnlyCollection<View>(bottomLine);
+
+        /// <summary>
+        /// The <see cref="View"/> to put in the top-left outside corner of the grid, or
+        /// <tt>null</tt> if there is no such view.
+        /// </summary>
+        public View TopLeftCorner { get; private set; }
+
+        /// <summary>
+        /// The <see cref="View"/> to put in the top-right outside corner of the grid, or
+        /// <tt>null</tt> if there is no such view.
+        /// </summary>
+        public View TopRightCorner { get; private set; }
+
+        /// <summary>
+        /// The <see cref="View"/> to put in the bottom-left outside corner of the grid, or
+        /// <tt>null</tt> if there is no such view.
+        /// </summary>
+        public View BottomLeftCorner { get; private set; }
+
+        /// <summary>
+        /// The <see cref="View"/> to put in the bottom-right outside corner of the grid, or
+        /// <tt>null</tt> if there is no such view.
+        /// </summary>
+        public View BottomRightCorner { get; private set; }
+
+        /// <summary>
+        /// Indicates whether this frame requires space above the Sudoku.
+        /// </summary>
+        public bool RequiresTopSpace =>
+            topLine.Length > 0 || TopLeftCorner != null || TopRightCorner != null;
+
+        /// <summary>
+        /// Indicates whether this frame requires space to the left of the Sudoku.
+        /// </summary>
+        public bool RequiresLeftSpace =>
+            leftLine.Length > 0 || TopLeftCorner != null || BottomLeftCorner != null;
+
+        /// <summary>
+        /// Indicates whether this frame requires space to the right of the Sudoku.
+        /// </summary>
+        public bool RequiresRightSpace =>
+            rightLine.Length > 0 || TopRightCorner != null || BottomRightCorner != null;
+
+        /// <summary>
+        /// Indicates whether this frame requires space below the Sudoku.
+        /// </summary>
+        public bool RequiresBottomSpace =>
+            bottomLine.Length > 0 || BottomLeftCorner != null || BottomRightCorner != null;
 
         /// <summary>
         /// The required size of the Sudoku that can be surrounded by this frame. If 0, there is no
@@ -159,75 +147,117 @@ namespace Sudoverse.Constraint
         /// </summary>
         public int SudokuSize { get; private set; }
 
-        private Frame() { }
+        public FramePlacementPreference PlacementPreference { get; private set; }
 
-        public static Frame Empty() =>
-            new Builder().Build();
+        private Frame()
+        {
+            topLine = new View[0];
+            leftLine = new View[0];
+            rightLine = new View[0];
+            bottomLine = new View[0];
+            TopLeftCorner = null;
+            TopRightCorner = null;
+            BottomLeftCorner = null;
+            BottomRightCorner = null;
+            SudokuSize = 0;
+            PlacementPreference = FramePlacementPreference.NoPreference;
+        }
 
+        public int CompareTo(Frame other) =>
+            PlacementPreference.CompareTo(other.PlacementPreference);
+
+        /// <summary>
+        /// A builder for frames.
+        /// </summary>
         public sealed class Builder
         {
             private Frame frame;
-            private bool topLeftOccupied;
-            private bool topRightOccupied;
-            private bool bottomLeftOccupied;
-            private bool bottomRightOccupied;
 
             public Builder()
             {
                 frame = new Frame();
-                topLeftOccupied = false;
-                topRightOccupied = false;
-                bottomLeftOccupied = false;
-                bottomRightOccupied = false;
             }
 
-            private Builder WithLine(FrameLine frameLine, ref bool startCorner, ref bool endCorner)
+            private Builder WithLine(View[] line, ref View[] toSet)
             {
-                int sudokuSize = frameLine.Views.Count;
-
-                if (frameLine.WithStartCorner)
-                {
-                    if (startCorner) throw new FrameLineCollisionException();
-                    else startCorner = true;
-
-                    sudokuSize -= 1;
-                }
-
-                if (frameLine.WithEndCorner)
-                {
-                    if (endCorner) throw new FrameLineCollisionException();
-                    else endCorner = true;
-
-                    sudokuSize -= 1;
-                }
-
-                if (sudokuSize < 1)
+                if (line.Length < 1)
                     throw new InvalidFrameLineSizeException();
 
                 if (frame.SudokuSize > 0)
                 {
-                    if (frame.SudokuSize != sudokuSize)
+                    if (frame.SudokuSize != line.Length)
                         throw new FrameLineSizeInconsistencyException();
                 }
                 else
                 {
-                    frame.SudokuSize = sudokuSize;
+                    frame.SudokuSize = line.Length;
                 }
 
+                toSet = line;
                 return this;
             }
 
-            public Builder WithTopLine(FrameLine frameLine) =>
-                WithLine(frameLine, ref topLeftOccupied, ref topRightOccupied);
+            /// <summary>
+            /// Sets the view to be displayed in the top line of the constructed frame. Gaps are
+            /// represented by <tt>null</tt> entries. To not display a top line, simply do not call
+            /// this method. The length of the line must be non-zero and equal to the length of all
+            /// previously specified lines.
+            /// </summary>
+            public Builder WithTopLine(View[] line) => WithLine(line, ref frame.topLine);
 
-            public Builder WithLeftLine(FrameLine frameLine) =>
-                WithLine(frameLine, ref topLeftOccupied, ref bottomLeftOccupied);
+            /// <summary>
+            /// Sets the view to be displayed in the left line of the constructed frame. Gaps are
+            /// represented by <tt>null</tt> entries. To not display a left line, simply do not
+            /// call this method. The length of the line must be non-zero and equal to the length
+            /// of all previously specified lines.
+            /// </summary>
+            public Builder WithLeftLine(View[] line) => WithLine(line, ref frame.leftLine);
 
-            public Builder WithRightLine(FrameLine frameLine) =>
-                WithLine(frameLine, ref topRightOccupied, ref bottomRightOccupied);
+            /// <summary>
+            /// Sets the view to be displayed in the right line of the constructed frame. Gaps are
+            /// represented by <tt>null</tt> entries. To not display a right line, simply do not
+            /// call this method. The length of the line must be non-zero and equal to the length
+            /// of all previously specified lines.
+            /// </summary>
+            public Builder WithRightLine(View[] line) => WithLine(line, ref frame.rightLine);
 
-            public Builder WithBottomLine(FrameLine frameLine) =>
-                WithLine(frameLine, ref bottomLeftOccupied, ref bottomRightOccupied);
+            /// <summary>
+            /// Sets the view to be displayed in the bottom line of the constructed frame. Gaps are
+            /// represented by <tt>null</tt> entries. To not display a bottom line, simply do not
+            /// call this method. The length of the line must be non-zero and equal to the length
+            /// of all previously specified lines.
+            /// </summary>
+            public Builder WithBottomLine(View[] line) => WithLine(line, ref frame.bottomLine);
+
+            public Builder WithTopLeftCorner(View corner)
+            {
+                frame.TopLeftCorner = corner;
+                return this;
+            }
+
+            public Builder WithTopRightCorner(View corner)
+            {
+                frame.TopRightCorner = corner;
+                return this;
+            }
+
+            public Builder WithBottomLeftCorner(View corner)
+            {
+                frame.BottomLeftCorner = corner;
+                return this;
+            }
+
+            public Builder WithBottomRightCorner(View corner)
+            {
+                frame.BottomRightCorner = corner;
+                return this;
+            }
+
+            public Builder WithPlacementPreference(FramePlacementPreference placementPreference)
+            {
+                frame.PlacementPreference = placementPreference;
+                return this;
+            }
 
             public Frame Build()
             {
@@ -239,5 +269,103 @@ namespace Sudoverse.Constraint
                 return result;
             }
         }
+    }
+
+    /// <summary>
+    /// A group of <see cref="Frame"/>s to surround a Sudoku, which is by invariant sorted by
+    /// placement preference.
+    /// </summary>
+    public sealed class FrameGroup : IEnumerable<Frame>
+    {
+        private Frame[] frames;
+
+        /// <summary>
+        /// The frames sorted from inner to outer.
+        /// </summary>
+        public ReadOnlyCollection<Frame> Frames => new ReadOnlyCollection<Frame>(frames);
+        
+        /// <summary>
+        /// The amount of space required above the Sudoku in cells.
+        /// </summary>
+        public int TopSpace { get; }
+
+        /// <summary>
+        /// The amount of space required to the left of the Sudoku in cells.
+        /// </summary>
+        public int LeftSpace { get; }
+
+        /// <summary>
+        /// The amount of space required to the right of the Sudoku in cells.
+        /// </summary>
+        public int RightSpace { get; }
+
+        /// <summary>
+        /// The amount of space required below the Sudoku in cells.
+        /// </summary>
+        public int BottomSpace { get; }
+
+        private FrameGroup(Frame[] frames)
+        {
+            this.frames = frames;
+
+            TopSpace = frames.Where(f => f.RequiresTopSpace).Count();
+            LeftSpace = frames.Where(f => f.RequiresLeftSpace).Count();
+            RightSpace = frames.Where(f => f.RequiresRightSpace).Count();
+            BottomSpace = frames.Where(f => f.RequiresBottomSpace).Count();
+        }
+
+        /// <summary>
+        /// Constructs a new frame group without frames.
+        /// </summary>
+        public static FrameGroup Empty() => new FrameGroup(new Frame[0]);
+
+        /// <summary>
+        /// Constructs a new frame group that contains only the provided frame.
+        /// </summary>
+        public static FrameGroup Singleton(Frame frame) => new FrameGroup(new Frame[1] { frame });
+
+        /// <summary>
+        /// Constructs a new frame group that contains all the frames present in the provided frame
+        /// groups. They are re-sorted to maintain inner-to-outer order.
+        /// </summary>
+        public static FrameGroup Combine(FrameGroup a, FrameGroup b)
+        {
+            // TODO simplify computation of required space
+
+            int aFrameCount = a.frames.Length;
+            int bFrameCount = b.frames.Length;
+            int frameCount = aFrameCount + bFrameCount;
+            var frames = new Frame[frameCount];
+            int aIndex = 0;
+            int bIndex = 0;
+            int i = 0;
+
+            for (; i < frameCount && aIndex < aFrameCount && bIndex < bFrameCount; i++)
+            {
+                if (a.frames[aIndex].CompareTo(b.frames[bIndex]) <= 0)
+                {
+                    frames[i] = a.frames[aIndex];
+                    aIndex++;
+                }
+                else
+                {
+                    frames[i] = b.frames[bIndex];
+                    bIndex++;
+                }
+            }
+
+            if (aIndex < aFrameCount)
+                Array.Copy(a.frames, aIndex, frames, i, aFrameCount - aIndex);
+            else if (bIndex < bFrameCount)
+                Array.Copy(b.frames, bIndex, frames, i, bFrameCount - bIndex);
+
+            return new FrameGroup(frames);
+        }
+
+        public IEnumerator<Frame> GetEnumerator() =>
+            frames.AsEnumerable().GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() =>
+            frames.GetEnumerator();
     }
 }

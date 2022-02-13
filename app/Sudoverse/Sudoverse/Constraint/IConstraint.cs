@@ -1,31 +1,22 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sudoverse.Util;
-using System;
+using System.Collections.Generic;
 using Xamarin.Forms;
 
 namespace Sudoverse.Constraint
 {
-    /// <summary>
-    /// An exception raised if the JSON data used to load a constraint is invalid for that type.
-    /// </summary>
-    internal class LoadConstraintException : Exception
-    {
-        public LoadConstraintException()
-            : base("Invalid JSON data for constraint.") { }
-    }
-
     public static class ConstraintUtil
     {
         public static IConstraint FromJson(JToken jtoken)
         {
             if (!(jtoken is JObject jobject))
-                throw new LoadConstraintException();
+                throw new ParseJsonException(jtoken.Type, JTokenType.Object);
 
             if (!jobject.TryGetValue("type", out JToken typeToken))
-                throw new LoadConstraintException();
+                throw new ParseJsonException("type");
 
             if (typeToken.Type != JTokenType.String)
-                throw new LoadConstraintException();
+                throw new ParseJsonException(typeToken.Type, JTokenType.String);
 
             var type = (string)typeToken;
 
@@ -36,14 +27,13 @@ namespace Sudoverse.Constraint
                 case "knights-move":
                 case "kings-move":
                     return new StatelessConstraint(type);
+                case "sandwich":
+                    return SandwichConstraint.FromJsonValue(jobject.GetField<JToken>("value"));
                 case "composite":
-                    if (!jobject.TryGetValue("value", out JToken valueToken))
-                        throw new LoadConstraintException();
-
-                    return CompositeConstraint.FromJsonValue(valueToken);
+                    return CompositeConstraint.FromJsonValue(jobject.GetField<JToken>("value"));
             }
 
-            throw new LoadConstraintException();
+            throw new ParseJsonException();
         }
 
         public static JToken ToJson(IConstraint constraint)
@@ -67,10 +57,11 @@ namespace Sudoverse.Constraint
         string Type { get; }
 
         /// <summary>
-        /// Gets the <see cref="Frame"/> that shall surround the Sudoku with additional information
-        /// about this constraint. Use <see cref="Frame.Empty"/> if you do not need such a frame.
+        /// Gets the <see cref="FrameGroup"/> that shall surround the Sudoku with additional
+        /// information about this constraint. Return an empty group if you do not need such a
+        /// frame.
         /// </summary>
-        Frame GetFrame();
+        FrameGroup GetFrames();
 
         /// <summary>
         /// Gets an array of <see cref="View"/>s which should be rendered behind the cells (between
