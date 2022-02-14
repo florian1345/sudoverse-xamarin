@@ -5,7 +5,12 @@ use std::thread;
 
 use sudoku_variants::{Sudoku, SudokuGrid};
 use sudoku_variants::constraint::Constraint;
-use sudoku_variants::generator::{Generator, Reducer};
+use sudoku_variants::generator::{
+    Generator,
+    Reducer,
+    Reduction,
+    ReductionPrioritizer
+};
 use sudoku_variants::solver::{Solution, Solver};
 use sudoku_variants::solver::strategy::{Strategy, SudokuInfo};
 
@@ -86,10 +91,10 @@ fn constraint_identity<C>(constraint: C, _: &SudokuGrid) -> C {
     constraint
 }
 
-fn gen_with_difficulty_thread<SL, SU, SG, C1, C2, FC1, FC2>(
+fn gen_with_difficulty_thread<SL, SU, SG, C1, C2, FC1, FC2, P>(
     lower_difficulty_bound_solver: SL,
     upper_difficulty_bound_solver: SU, generator_solver: SG,
-    constraint_cons: FC1, constraint_transform: FC2,
+    constraint_cons: FC1, constraint_transform: FC2, reduction_prioritizer: P,
     cancel_handle: CancelHandle, result_sender: Sender<Sudoku<C2>>)
 where
     SL: Solver,
@@ -98,7 +103,8 @@ where
     C1: Constraint + Clone + 'static,
     C2: Constraint + Clone + 'static,
     FC1: Fn() -> C1,
-    FC2: Fn(C1, &SudokuGrid) -> C2
+    FC2: Fn(C1, &SudokuGrid) -> C2,
+    P: ReductionPrioritizer<Reduction<C2::Reduction>> + Clone
 {
     let mut generator = Generator::new_default();
     let mut reducer = Reducer::new(generator_solver, rand::thread_rng());
@@ -109,7 +115,8 @@ where
         let (grid, constraint) = sudoku.into_raw_parts();
         let constraint = constraint_transform(constraint, &grid);
         let mut sudoku = Sudoku::new_with_grid(grid, constraint);
-        reducer.reduce(&mut sudoku);
+        reducer.reduce_with_priority(&mut sudoku,
+            reduction_prioritizer.clone());
 
         if can_solve(&sudoku, &lower_difficulty_bound_solver) {
             continue;
@@ -147,10 +154,13 @@ where
 /// constraint of the Sudoku to reduce. For stateless constraints, this is the
 /// identity, but reducible constraints may compute things like sandwich sums
 /// or generate random Killer Sudoku cages here.
-fn gen_with_difficulty<SL, FSL, SU, FSU, SG, FSG, C1, C2, FC1, FC2>(
+/// * `reduction_prioritizer`: The [ReductionPrioritizer] to use for
+/// prioritizing reductions.
+fn gen_with_difficulty<SL, FSL, SU, FSU, SG, FSG, C1, C2, FC1, FC2, P>(
     lower_difficulty_bound_solver_cons: FSL,
     upper_difficulty_bound_solver_cons: FSU, generator_solver_cons: FSG,
-    constraint_cons: FC1, constraint_transform: FC2) -> Sudoku<C2>
+    constraint_cons: FC1, constraint_transform: FC2, reduction_prioritizer: P)
+    -> Sudoku<C2>
 where
     SL: Solver + Send + 'static,
     FSL: Fn(CancelHandle) -> SL,
@@ -161,7 +171,9 @@ where
     C1: Constraint + Clone + 'static,
     C2: Constraint + Clone + Send + 'static,
     FC1: Fn() -> C1 + Send + Copy + 'static,
-    FC2: Fn(C1, &SudokuGrid) -> C2 + Send + Copy + 'static
+    FC2: Fn(C1, &SudokuGrid) -> C2 + Send + Copy + 'static,
+    P: ReductionPrioritizer<Reduction<C2::Reduction>> + Clone + Copy + Send
+        + 'static
 {
     // TODO replace with thread::available_parallelism once stable
     let threads = num_cpus::get();
@@ -180,7 +192,7 @@ where
         thread::spawn(move || gen_with_difficulty_thread(
             lower_difficulty_bound_solver, upper_difficulty_bound_solver,
             generator_solver, constraint_cons, constraint_transform,
-            cancel_handle, result_sender));
+            reduction_prioritizer, cancel_handle, result_sender));
     }
 
     drop(sender);
