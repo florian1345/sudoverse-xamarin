@@ -13,6 +13,7 @@ use sudoku_variants::constraint::{
     DiagonalsConstraint,
     KnightsMoveConstraint
 };
+use sudoku_variants::generator::ReductionPrioritizer;
 use sudoku_variants::solver::Solver;
 use sudoku_variants::solver::strategy::{
     BoundedCellsBacktrackingStrategy,
@@ -150,6 +151,15 @@ pub(crate) fn chess_constraint() -> DefaultChessConstraint {
     )
 }
 
+#[derive(Clone, Copy)]
+struct EqualPrioritizer;
+
+impl<R> ReductionPrioritizer<R> for EqualPrioritizer {
+    fn rough_priority(&mut self, _: &R) -> f64 {
+        0.0
+    }
+}
+
 pub(crate) fn gen_simple<C, FC>(difficulty: i32, constraint_cons: FC) -> Sudoku<C>
 where
     C: Constraint + Clone + Into<AnyConstraint> + Send + Serialize + 'static,
@@ -161,31 +171,36 @@ where
             default_difficulty_1,
             default_difficulty_1,
             constraint_cons,
-            generate::constraint_identity),
+            generate::constraint_identity,
+            EqualPrioritizer),
         2 => generate::gen_with_difficulty(
             default_difficulty_1,
             default_difficulty_2,
             default_difficulty_2,
             constraint_cons,
-            generate::constraint_identity),
+            generate::constraint_identity,
+            EqualPrioritizer),
         3 => generate::gen_with_difficulty(
             default_difficulty_2,
             default_difficulty_3,
             default_difficulty_5,
             constraint_cons,
-            generate::constraint_identity),
+            generate::constraint_identity,
+            EqualPrioritizer),
         4 => generate::gen_with_difficulty(
             default_difficulty_3,
             default_difficulty_4,
             default_difficulty_5,
             constraint_cons,
-            generate::constraint_identity),
+            generate::constraint_identity,
+            EqualPrioritizer),
         5 => generate::gen_with_difficulty(
             default_difficulty_4,
             generate::difficulty_inf,
             default_difficulty_5,
             constraint_cons,
-            generate::constraint_identity),
+            generate::constraint_identity,
+            EqualPrioritizer),
         _ => panic!("Invalid difficulty: {}", difficulty)
     }
 }

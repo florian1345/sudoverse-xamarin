@@ -4,9 +4,12 @@ use crate::sync::CancelHandle;
 use sudoku_variants::{Sudoku, SudokuGrid};
 use sudoku_variants::constraint::{
     CompositeConstraint,
+    CompositeData,
     DefaultConstraint,
-    SandwichConstraint
+    SandwichConstraint,
 };
+use sudoku_variants::constraint::sandwich::SandwichReduction;
+use sudoku_variants::generator::Reduction;
 use sudoku_variants::solver::Solver;
 use sudoku_variants::solver::strategy::{
     BoundedCellsBacktrackingStrategy,
@@ -141,6 +144,14 @@ fn make_sandwich_constraint(c1: DefaultConstraint, grid: &SudokuGrid)
     CompositeConstraint::new(c1, c2)
 }
 
+fn prioritize(reduction: &Reduction<CompositeData<(), SandwichReduction>>)
+        -> f64 {
+    match reduction {
+        Reduction::RemoveDigit { .. } => 0.0,
+        Reduction::ReduceConstraint { .. } => 100.0
+    }
+}
+
 pub(crate) fn gen_sandwich(difficulty: i32)
         -> Sudoku<DefaultSandwichConstraint> {
     match difficulty {
@@ -149,31 +160,36 @@ pub(crate) fn gen_sandwich(difficulty: i32)
             sandwich_difficulty_1,
             sandwich_difficulty_1,
             generate::default_constraint,
-            make_sandwich_constraint),
+            make_sandwich_constraint,
+            prioritize),
         2 => generate::gen_with_difficulty(
             sandwich_difficulty_1,
             sandwich_difficulty_2,
             sandwich_difficulty_2,
             generate::default_constraint,
-            make_sandwich_constraint),
+            make_sandwich_constraint,
+            prioritize),
         3 => generate::gen_with_difficulty(
             sandwich_difficulty_2,
             sandwich_difficulty_3,
             sandwich_difficulty_5,
             generate::default_constraint,
-            make_sandwich_constraint),
+            make_sandwich_constraint,
+            prioritize),
         4 => generate::gen_with_difficulty(
             sandwich_difficulty_3,
             sandwich_difficulty_4,
             sandwich_difficulty_5,
             generate::default_constraint,
-            make_sandwich_constraint),
+            make_sandwich_constraint,
+            prioritize),
         5 => generate::gen_with_difficulty(
             sandwich_difficulty_4,
             generate::difficulty_inf,
             sandwich_difficulty_5,
             generate::default_constraint,
-            make_sandwich_constraint),
+            make_sandwich_constraint,
+            prioritize),
         _ => panic!("Invalid difficulty: {}", difficulty)
     }
 }
