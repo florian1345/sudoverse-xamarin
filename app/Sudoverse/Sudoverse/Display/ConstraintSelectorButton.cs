@@ -4,43 +4,43 @@ using Xamarin.Forms;
 
 namespace Sudoverse.Display
 {
-    public sealed class ConstraintSelector : Layout<View>
+    public sealed class ConstraintSelectorButton : Layout<View>
     {
         public static readonly BindableProperty ImageSourceProperty =
             BindableProperty.Create(nameof(ImageSource), typeof(string),
-                typeof(ConstraintSelector), propertyChanged: OnImageSourceChanged);
+                typeof(ConstraintSelectorButton), propertyChanged: OnImageSourceChanged);
 
         public static readonly BindableProperty TitleProperty =
-            BindableProperty.Create(nameof(Title), typeof(string), typeof(ConstraintSelector),
-                propertyChanged: OnTitleChanged);
+            BindableProperty.Create(nameof(Title), typeof(string),
+                typeof(ConstraintSelectorButton), propertyChanged: OnTitleChanged);
 
         public static readonly BindableProperty DescriptionProperty =
             BindableProperty.Create(nameof(Description), typeof(string),
-                typeof(ConstraintSelector), propertyChanged: OnDescriptionChanged);
+                typeof(ConstraintSelectorButton), propertyChanged: OnDescriptionChanged);
 
         public static readonly BindableProperty ActiveProperty =
-            BindableProperty.Create(nameof(Active), typeof(bool), typeof(ConstraintSelector),
+            BindableProperty.Create(nameof(Active), typeof(bool), typeof(ConstraintSelectorButton),
                 false, propertyChanged: OnActiveChanged);
 
         private static void OnImageSourceChanged(BindableObject bindable, object _, object value)
         {
-            ((ConstraintSelector)bindable).image.Source = (string)value;
+            ((ConstraintSelectorButton)bindable).image.Source = (string)value;
         }
 
         private static void OnTitleChanged(BindableObject bindable, object _, object value)
         {
-            ((ConstraintSelector)bindable).title.Text = (string)value;
+            ((ConstraintSelectorButton)bindable).title.Text = (string)value;
         }
 
         private static void OnDescriptionChanged(BindableObject bindable, object _, object value)
         {
-            ((ConstraintSelector)bindable).description.Text = (string)value;
+            ((ConstraintSelectorButton)bindable).description.Text = (string)value;
         }
 
         private static void OnActiveChanged(BindableObject bindable, object _, object value)
         {
             bool bValue = (bool)value;
-            var constraintSelector = (ConstraintSelector)bindable;
+            var constraintSelector = (ConstraintSelectorButton)bindable;
 
             if (bValue) constraintSelector.frame.BackgroundColor = SelectedColor;
             else constraintSelector.frame.BackgroundColor = UnselectedColor;
@@ -88,7 +88,7 @@ namespace Sudoverse.Display
 
         public event EventHandler<bool> ActiveChanged;
 
-        public ConstraintSelector()
+        public ConstraintSelectorButton()
         {
             frame = new Frame()
             {

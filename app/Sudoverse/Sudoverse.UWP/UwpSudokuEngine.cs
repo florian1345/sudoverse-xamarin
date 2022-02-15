@@ -13,5 +13,11 @@ namespace Sudoverse.UWP
 
         public string Check(string json) =>
             EngineDll.Check(json);
+
+        public string Fill(string json) =>
+            EngineDll.Fill(json);
+
+        public byte IsSolvable(string json) =>
+            EngineDll.IsSolvable(json);
     }
 }

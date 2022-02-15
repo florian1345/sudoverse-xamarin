@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sudoverse.Util;
-using System.Collections.Generic;
+using System;
 using Xamarin.Forms;
 
 namespace Sudoverse.Constraint
@@ -52,6 +52,13 @@ namespace Sudoverse.Constraint
     public interface IConstraint
     {
         /// <summary>
+        /// This event is raised whenever a view in the editor frame of this constraint is
+        /// focused. In this case, all cells in the grid should be deselected to avoid any
+        /// unintended input.
+        /// </summary>
+        event EventHandler EditorFrameFocused;
+
+        /// <summary>
         /// The textual type identifier of this constraint.
         /// </summary>
         string Type { get; }
@@ -62,6 +69,14 @@ namespace Sudoverse.Constraint
         /// frame.
         /// </summary>
         FrameGroup GetFrames();
+
+        /// <summary>
+        /// Gets the <see cref="FrameGroup"/> that shall surround the Sudoku with additional
+        /// information about this constraint in the editor. It should support modification of the
+        /// data inside the frame, which should then modify the constraint. Return an empty group
+        /// if you do not need such a frame.
+        /// </summary>
+        FrameGroup GetEditorFrames();
 
         /// <summary>
         /// Gets an array of <see cref="View"/>s which should be rendered behind the cells (between

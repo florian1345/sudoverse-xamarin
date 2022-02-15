@@ -14,41 +14,82 @@ use sudoku_variants::constraint::{
 };
 use sudoku_variants::constraint::sandwich::SandwichReduction;
 
+/// An enumeration that multiplexes all different reduction types of
+/// constraints that are used in the app. This is the reduction type of the
+/// [AnyConstraint] type (see [Constraint::Reduction]).
 pub(crate) enum AnyReduction {
+
+    /// A reduction of the [AnyConstraint::Sandwich] variant.
     Sandwich(SandwichReduction),
+
+    /// A reduction of the [AnyConstraint::Composite] variant. 
     Composite {
+
+        /// The index of the constraint within the composite constraint to
+        /// which this reduction applies.
         index: usize,
+
+        /// The reduction to be applied to the individual constraint.
         reduction: Box<AnyReduction>
     }
 }
 
+/// An enumeration that multiplexes all different revert info types of
+/// constraints that are used in the app. This is the revert info type of the
+/// [AnyConstraint] type (see [Constraint::RevertInfo]).
 pub(crate) enum AnyRevertInfo {
+
+    /// A revert info of the [AnyConstraint::Sandwich] variant.
     Sandwich(usize),
+
+    /// A revert info of the [AnyConstraint::Composite] variant. 
     Composite {
+
+        /// The index of the constraint within the composite constraint to
+        /// which this revert info applies.
         index: usize,
+
+        /// The revert info for the individual constraint.
         revert_info: Box<AnyRevertInfo>
     }
 }
 
+/// An enumeration of the different constraints that are used in the app. This
+/// allows monomorphic Sudoku in contexts where the constraint may not be clear
+/// statically, however it comes at a performance cost. This is mainly to be
+/// used in cases where performance is not a big issue and for serialization
+/// and deserialization.
+///
+/// It can be obtained from all supported specific constraint types via the
+/// [From] trait.
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(tag = "type", content = "value")]
 pub(crate) enum AnyConstraint {
 
+    /// Represents a [DefaultConstraint].
     #[serde(rename = "default")]
     Default,
 
+    /// Represents a [DiagonalsConstraint].
     #[serde(rename = "diagonals")]
     Diagonals,
 
+    /// Represents a [KnightsMoveConstraint].
     #[serde(rename = "knights-move")]
     KnightsMove,
 
+    /// Represents a [DiagonallyAdjacentConstraint].
     #[serde(rename = "kings-move")]
     KingsMove,
 
+    /// Wraps a [SandwichConstraint].
     #[serde(rename = "sandwich")]
     Sandwich(SandwichConstraint),
 
+    /// A composite constraint consisting of the wrapped [AnyConstraint]s. This
+    /// is different to the [CompositeConstraint] of the `sudoku-variants`
+    /// crate in that the element types are not known statically and it can
+    /// thus have variable size.
     #[serde(rename = "composite")]
     Composite(Vec<AnyConstraint>)
 }

@@ -1,44 +1,34 @@
 ﻿using Sudoverse.Display;
-using Sudoverse.Engine;
 using Sudoverse.SudokuModel;
-using Sudoverse.Util;
+
 using System;
+
 using Xamarin.Forms;
 
 namespace Sudoverse
 {
-    public partial class PlayPage : KeyListenerPage
+    public partial class PlayPage : SudokuPage
 	{
 		private static readonly Color NotationButtonSelectedBackground = Color.Gray;
 		private static readonly Color NotationButtonUnselectedBackground = Color.LightGray;
 
-		private const int UNDO_CAPACITY = 255;
-
 		private Notation notation;
-		private SudokuView sudokuView;
-		private DropOutStack<Operation> undos;
-		private DropOutStack<Operation> redos;
 		private Notation notation1 = Notation.Center;
 		private bool finished = false;
 
 		public PlayPage(Sudoku sudoku)
+			: base(sudoku, false)
 		{
 			InitializeComponent();
-			sudokuView = new SudokuView(sudoku);
-			Layout.Children.Insert(0, sudokuView);
-            KeyDown += OnKeyDown;
-			KeyUp += OnKeyUp;
+			Layout.Children.Insert(0, SudokuView);
 
 			ButtonNotationNormal.BorderColor = NotationButtonSelectedBackground;
 			ButtonNotation1.BorderColor = NotationButtonUnselectedBackground;
 			ButtonNotation2.BorderColor = NotationButtonUnselectedBackground;
 			ButtonNotation3.BorderColor = NotationButtonUnselectedBackground;
 
-			undos = new DropOutStack<Operation>(UNDO_CAPACITY);
-			redos = new DropOutStack<Operation>(UNDO_CAPACITY);
-
 			// TODO make more dynamic
-			if (sudokuView.Sudoku.PencilmarkType == PencilmarkType.PositionalPencilmarkType)
+			if (SudokuView.Sudoku.PencilmarkType == PencilmarkType.PositionalPencilmarkType)
             {
 				ButtonNotation1.Source = "notation_positional.png";
 				notation1 = Notation.Positional;
@@ -47,9 +37,21 @@ namespace Sudoverse
             }
 		}
 
+        protected override void OnChanged()
+		{
+			finished = false;
+		}
+
+		protected override void OnCheckCorrect()
+		{
+			DisplayAlert("Check", "Congratulations, you won!", "Ok");
+			finished = true;
+			SaveManager.RemoveCurrent();
+		}
+
 		public void SaveCurrent()
         {
-			if (!finished) SaveManager.SaveCurrent(sudokuView.Sudoku);
+			if (!finished) SaveManager.SaveCurrent(SudokuView.Sudoku);
 		}
 
 		private void UpdateNotationButton(ImageButton button, bool selected)
@@ -67,89 +69,6 @@ namespace Sudoverse
 			UpdateNotationButton(ButtonNotation2, notation == Notation.Border);
 			UpdateNotationButton(ButtonNotation3, notation == Notation.Color);
 		}
-
-		private void PushUndo(Operation operation)
-		{
-			if (!operation.IsNop())
-			{
-				undos.Push(operation);
-				redos.Clear();
-			}
-		}
-
-		private void Enter(int digit)
-        {
-			PushUndo(sudokuView.Enter(digit, notation));
-			finished = false;
-		}
-
-		private void Clear()
-		{
-			PushUndo(sudokuView.ClearSelected());
-			finished = false;
-		}
-
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-				case Key.Digit1:
-					Enter(1);
-					break;
-				case Key.Digit2:
-					Enter(2);
-					break;
-				case Key.Digit3:
-					Enter(3);
-					break;
-				case Key.Digit4:
-					Enter(4);
-					break;
-				case Key.Digit5:
-					Enter(5);
-					break;
-				case Key.Digit6:
-					Enter(6);
-					break;
-				case Key.Digit7:
-					Enter(7);
-					break;
-				case Key.Digit8:
-					Enter(8);
-					break;
-				case Key.Digit9:
-					Enter(9);
-					break;
-				case Key.Y:
-					if (sudokuView.ControlDown) Redo();
-					break;
-				case Key.Z:
-					if (sudokuView.ControlDown) Undo();
-					break;
-				case Key.Delete:
-					Clear();
-					break;
-				case Key.Shift:
-					sudokuView.ShiftDown.Set();
-					break;
-				case Key.Control:
-					sudokuView.ControlDown.Set();
-					break;
-			}
-        }
-
-		private void OnKeyUp(object sender, KeyEventArgs e)
-        {
-			switch (e.Key)
-            {
-				case Key.Shift:
-					sudokuView.ShiftDown.Reset();
-					break;
-				case Key.Control:
-					sudokuView.ControlDown.Reset();
-					break;
-            }
-        }
 
         private void OnOne(object sender, EventArgs e)
 		{
@@ -201,25 +120,9 @@ namespace Sudoverse
 			Clear();
 		}
 
-		private void OnCheck(object sender, EventArgs e)
+        private void OnCheck(object sender, EventArgs e)
 		{
-			var checkResponse = SudokuEngineProvider.Engine.Check(sudokuView.Sudoku);
-			
-			if (checkResponse.Valid)
-			{
-				if (sudokuView.Sudoku.Full)
-				{
-					DisplayAlert("Check", "Congratulations, you won!", "Ok");
-					finished = true;
-					SaveManager.RemoveCurrent();
-				}
-				else DisplayAlert("Check", "No mistakes so far.", "Ok");
-            }
-			else
-            {
-				sudokuView.MarkInvalid(checkResponse.InvalidCells);
-				DisplayAlert("Check", "Not correct.", "Ok");
-			}
+			Check();
 		}
 
 		private void OnBack(object sender, EventArgs e)
@@ -296,26 +199,14 @@ namespace Sudoverse
 			SetColorLabels();
         }
 
-		private void Undo()
-        {
-			if (!undos.Empty)
-				redos.Push(undos.Pop().Apply(sudokuView.Sudoku));
-        }
-
-		private void Redo()
-		{
-			if (!redos.Empty)
-				undos.Push(redos.Pop().Apply(sudokuView.Sudoku));
-		}
-
 		private void OnUndo(object sender, EventArgs e)
         {
-			Undo();
+			SudokuView.Undo();
         }
 
 		private void OnRedo(object sender, EventArgs e)
         {
-			Redo();
+			SudokuView.Redo();
         }
 	}
 }

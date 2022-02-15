@@ -1,13 +1,19 @@
 ﻿using Newtonsoft.Json.Linq;
+
 using Sudoverse.Util;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Xamarin.Forms;
 
 namespace Sudoverse.Constraint
 {
     internal sealed class CompositeConstraint : IConstraint
     {
+        public event EventHandler EditorFrameFocused;
+
         private List<IConstraint> constraints;
 
         public string Type => "composite";
@@ -15,7 +21,16 @@ namespace Sudoverse.Constraint
         private CompositeConstraint(List<IConstraint> constraints)
         {
             this.constraints = constraints;
+
+            foreach (var constraint in this.constraints)
+            {
+                constraint.EditorFrameFocused += (sender, e) =>
+                    EditorFrameFocused?.Invoke(sender, e);
+            }
         }
+
+        public CompositeConstraint(params IConstraint[] constraints)
+            : this(constraints.ToList()) { }
 
         public View[] GetBackgroundViews(ReadOnlyMatrix<ReadOnlyRect> fieldBounds)
         {
@@ -29,6 +44,9 @@ namespace Sudoverse.Constraint
 
         public FrameGroup GetFrames() =>
             constraints.Select(c => c.GetFrames()).Aggregate(FrameGroup.Combine);
+
+        public FrameGroup GetEditorFrames() =>
+            constraints.Select(c => c.GetEditorFrames()).Aggregate(FrameGroup.Combine);
 
         public JToken ToJsonValue()
         {

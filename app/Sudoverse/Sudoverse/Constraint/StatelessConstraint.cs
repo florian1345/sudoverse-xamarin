@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sudoverse.Util;
+using System;
 using Xamarin.Forms;
 
 namespace Sudoverse.Constraint
@@ -10,6 +11,8 @@ namespace Sudoverse.Constraint
     /// </summary>
     internal sealed class StatelessConstraint : IConstraint
     {
+        public event EventHandler EditorFrameFocused;
+
         public string Type { get; }
 
         public StatelessConstraint(string type)
@@ -21,6 +24,9 @@ namespace Sudoverse.Constraint
             new View[0];
 
         public FrameGroup GetFrames() =>
+            FrameGroup.Empty();
+
+        public FrameGroup GetEditorFrames() =>
             FrameGroup.Empty();
 
         public JToken ToJsonValue() =>

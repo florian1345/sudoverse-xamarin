@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:display="clr-namespace:Sudoverse.Display;assembly=Sudoverse"
-             x:Class="Sudoverse.PlayOptionsPage">
+             x:Class="Sudoverse.EditorOptionsPage">
     <ContentPage.Content>
         <StackLayout
                 Spacing="20"
@@ -13,22 +13,6 @@
                 VerticalOptions="EndAndExpand" 
                 HorizontalOptions="Center"
                 HorizontalTextAlignment="Center" />
-            <StackLayout
-                    Orientation="Horizontal"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center">
-                <Label
-                    Text="Difficulty"
-                    FontSize="Medium"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center"
-                    MaxLines="1" />
-                <display:DifficultySlider
-                    x:Name="DifficultySlider"
-                    VerticalOptions="Fill"
-                    HorizontalOptions="Fill"
-                    HeightRequest="50" />
-            </StackLayout>
             <ScrollView VerticalOptions="FillAndExpand">
                 <display:ConstraintSelector x:Name="ConstraintSelector" />
             </ScrollView>
@@ -42,10 +26,10 @@
                     HorizontalOptions="Center"
                     Clicked="OnBack" />
                 <Button
-                    Text="Start"
+                    Text="Edit"
                     VerticalOptions="Center" 
                     HorizontalOptions="Center"
-                    Clicked="OnStart" />
+                    Clicked="OnEdit" />
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

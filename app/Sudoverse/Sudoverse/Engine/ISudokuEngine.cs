@@ -23,5 +23,21 @@
         /// <see cref="CheckResponse.ParseJson(string)"/>.
         /// </summary>
         string Check(string json);
+
+        /// <summary>
+        /// Generates a random Sudoku grid that satisfies the given Sudoku's constraint. The Sudoku
+        /// must be provided in JSON form, which can be obtained using
+        /// <see cref="SudokuModel.Sudoku.ToJson()"/>. The result is returned as JSON as well,
+        /// which can be parsed using <see cref="FillResponse.ParseJson(string)"/>.
+        /// </summary>
+        string Fill(string json);
+
+        /// <summary>
+        /// Determines whether the given Sudoku is uniquely solvable. Returns 0 if it is, 1 if it
+        /// is impossible (i.e. there exist no valid solutions), and 2 if it is ambiguous (i.e.
+        /// there exist more than one valid solutions). The Sudoku must be provided in JSON form,
+        /// which can be obtained using <see cref="SudokuModel.Sudoku.ToJson()"/>.
+        /// </summary>
+        byte IsSolvable(string json);
     }
 }

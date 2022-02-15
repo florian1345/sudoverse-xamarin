@@ -32,6 +32,17 @@ namespace Sudoverse.SudokuModel
             public override string GetIdentifier() => IDENTIFIER;
         }
 
+        private sealed class NoPencilmarkTypeImpl : PencilmarkType
+        {
+            public const string IDENTIFIER = "none";
+
+            public override IPencilmark Empty() => new NoPencilmark();
+
+            public override IPencilmark FromJson(JToken token) => Empty();
+
+            public override string GetIdentifier() => IDENTIFIER;
+        }
+
         /// <summary>
         /// A pencilmark type for the <see cref="CenterBorderPencilmark"/>.
         /// </summary>
@@ -43,6 +54,11 @@ namespace Sudoverse.SudokuModel
         /// </summary>
         public static readonly PencilmarkType PositionalPencilmarkType =
             new PositionalPencilmarkTypeImpl();
+
+        /// <summary>
+        /// A pencilmark type for the <see cref="NoPencilmark"/>.
+        /// </summary>
+        public static readonly PencilmarkType NoPencilmarkType = new NoPencilmarkTypeImpl();
 
         private PencilmarkType() { }
 
@@ -72,6 +88,7 @@ namespace Sudoverse.SudokuModel
             {
                 case CenterBorderPencilmarkTypeImpl.IDENTIFIER: return CenterBorderPencilmarkType;
                 case PositionalPencilmarkTypeImpl.IDENTIFIER: return PositionalPencilmarkType;
+                case NoPencilmarkTypeImpl.IDENTIFIER: return NoPencilmarkType;
                 default: throw new ParseJsonException();
             }
         }

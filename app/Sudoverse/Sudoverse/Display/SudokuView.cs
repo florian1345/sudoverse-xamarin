@@ -18,6 +18,8 @@ namespace Sudoverse.Display
             Remove
         }
 
+        private const int UNDO_CAPACITY = 255;
+
         // all relative to the size of a cell
 
         private const double FONT_SIZE_FACTOR = 0.5;
@@ -38,14 +40,16 @@ namespace Sudoverse.Display
         private HashSet<(int, int)> selected;
         private ICollection<(int, int)> markedInvalid;
         private bool mouseDown;
+        private DropOutStack<Operation> undos;
+        private DropOutStack<Operation> redos;
 
         public SharedFlag ShiftDown { get; }
         public SharedFlag ControlDown { get; }
 
-        public SudokuView(Sudoku sudoku) : base()
+        public SudokuView(Sudoku sudoku, bool editor) : base()
         {
             Sudoku = sudoku;
-            frames = Sudoku.Constraint.GetFrames();
+            frames = editor ? Sudoku.Constraint.GetEditorFrames() : Sudoku.Constraint.GetFrames();
 
             int widthCells = Sudoku.Size + frames.LeftSpace + frames.RightSpace;
             int heightCells = Sudoku.Size + frames.TopSpace + frames.BottomSpace;
@@ -108,6 +112,17 @@ namespace Sudoverse.Display
             mouseDown = false;
             ShiftDown = new SharedFlag();
             ControlDown = new SharedFlag();
+            undos = new DropOutStack<Operation>(UNDO_CAPACITY);
+            redos = new DropOutStack<Operation>(UNDO_CAPACITY);
+        }
+
+        private void PushUndo(Operation operation)
+        {
+            if (!operation.IsNop())
+            {
+                undos.Push(operation);
+                redos.Clear();
+            }
         }
 
         private void AddChildIfNotNull(View view)
@@ -184,7 +199,7 @@ namespace Sudoverse.Display
             }
         }
 
-        private void DeselectAll()
+        public void DeselectAll()
         {
             foreach ((int selectedColumn, int selectedRow) in selected)
             {
@@ -270,10 +285,10 @@ namespace Sudoverse.Display
             }
         }
 
-        private Operation ApplyToSelected(Func<int, int, Operation> operation)
+        private bool ApplyToSelected(Func<int, int, Operation> operation)
         {
             var reverseStack = new Stack<Operation>();
-
+            
             foreach ((int column, int row) in selected)
             {
                 var reverse = operation(column, row);
@@ -282,10 +297,12 @@ namespace Sudoverse.Display
                     reverseStack.Push(reverse);
             }
 
-            if (reverseStack.Count == 0)
-                return new NoOperation();
+            if (reverseStack.Count == 0) return false;
             else if (reverseStack.Count == 1)
-                return reverseStack.Pop();
+            {
+                PushUndo(reverseStack.Pop());
+                return true;
+            }
             else
             {
                 var reverseArray = new Operation[reverseStack.Count];
@@ -295,15 +312,53 @@ namespace Sudoverse.Display
                     reverseArray[i] = reverseStack.Pop();
                 }
 
-                return new CompositeOperation(reverseArray);
+                PushUndo(new CompositeOperation(reverseArray));
+                return true;
             }
         }
 
-        public Operation Enter(int digit, Notation notation) =>
+        public bool Enter(int digit, Notation notation) =>
             ApplyToSelected((column, row) => Sudoku.EnterCell(column, row, digit, notation));
 
-        public Operation ClearSelected() =>
+        public bool ClearSelected() =>
             ApplyToSelected((column, row) => Sudoku.ClearCell(column, row));
+
+        public void FillWith(SudokuGrid grid)
+        {
+            if (grid.Size != Sudoku.Size)
+                throw new ArgumentException("Grid and Sudoku have unequal sizes.");
+
+            var revertList = new List<Operation>();
+
+            for (int row = 0; row < grid.Size; row++)
+            {
+                for (int column = 0; column < grid.Size; column++)
+                {
+                    if (!Sudoku.GetCell(column, row).Filled)
+                    {
+                        Sudoku.EnterCell(column, row, grid[column, row], Notation.Normal);
+                        revertList.Add(new ClearOperation(column, row));
+                    }
+                }
+            }
+
+            if (revertList.Count == 1)
+                PushUndo(revertList[0]);
+            else if (revertList.Count > 1)
+                PushUndo(new CompositeOperation(revertList.ToArray()));
+        }
+
+        public void Undo()
+        {
+            if (!undos.Empty)
+                redos.Push(undos.Pop().Apply(Sudoku));
+        }
+
+        public void Redo()
+        {
+            if (!redos.Empty)
+                undos.Push(redos.Pop().Apply(Sudoku));
+        }
 
         public void MarkInvalid(ICollection<(int, int)> invalidCells)
         {

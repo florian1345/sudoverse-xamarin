@@ -28,5 +28,15 @@ namespace Sudoverse.Engine
             var responseJson = engine.Check(sudokuJson);
             return CheckResponse.ParseJson(responseJson);
         }
+
+        public FillResponse Fill(Sudoku sudoku)
+        {
+            var sudokuJson = sudoku.ToJson();
+            var responseJson = engine.Fill(sudokuJson);
+            return FillResponse.ParseJson(responseJson);
+        }
+
+        public Solvability IsSolvable(Sudoku sudoku) =>
+            (Solvability)engine.IsSolvable(sudoku.ToJson());
     }
 }
