@@ -20,7 +20,6 @@ use sudoku_variants::solver::strategy::{
     OnlyCellStrategy,
     StrategicBacktrackingSolver,
     StrategicSolver,
-    Strategy,
     TupleStrategy
 };
 use sudoku_variants::solver::strategy::specific::{
@@ -28,7 +27,10 @@ use sudoku_variants::solver::strategy::specific::{
     SandwichPossibilitiesStrategy
 };
 
-fn sandwich_strategy() -> impl Strategy {
+pub(crate) type SandwichStrategy = CompositeStrategy<
+    SandwichBunPlacementStrategy, SandwichPossibilitiesStrategy>;
+
+pub(crate) fn sandwich_strategy() -> SandwichStrategy {
     CompositeStrategy::new(
         SandwichBunPlacementStrategy,
         SandwichPossibilitiesStrategy

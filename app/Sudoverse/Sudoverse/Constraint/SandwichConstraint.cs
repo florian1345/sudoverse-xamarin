@@ -3,6 +3,7 @@
 using Sudoverse.Display;
 using Sudoverse.Util;
 
+using System;
 using System.Linq;
 
 using Xamarin.Forms;
@@ -15,6 +16,8 @@ namespace Sudoverse.Constraint
     /// </summary>
     public sealed class SandwichConstraint : IConstraint
     {
+        public event EventHandler EditorFrameFocused;
+
         private int[] columnSandwiches;
         private int[] rowSandwiches;
 
@@ -25,6 +28,9 @@ namespace Sudoverse.Constraint
             this.columnSandwiches = columnSandwiches;
             this.rowSandwiches = rowSandwiches;
         }
+
+        public SandwichConstraint(int sudokuSize)
+            : this(Utils.ArrayRepeat(-1, sudokuSize), Utils.ArrayRepeat(-1, sudokuSize)) { }
 
         public View[] GetBackgroundViews(ReadOnlyMatrix<ReadOnlyRect> fieldBounds) =>
             new View[0];
@@ -47,6 +53,33 @@ namespace Sudoverse.Constraint
             FrameGroup.Singleton(new Frame.Builder()
                 .WithTopLine(ToFrameLine(columnSandwiches))
                 .WithLeftLine(ToFrameLine(rowSandwiches))
+                .Build());
+
+        private View[] ToEditorLine(int[] sandwiches)
+        {
+            var line = new View[sandwiches.Length];
+
+            for (int i = 0; i < line.Length; i++)
+            {
+                var view = new FrameNumberEditView();
+                int fi = i;
+
+                view.NumberChanged += (sender, e) =>
+                {
+                    sandwiches[fi] = view.Number == null ? -1 : (int)view.Number;
+                };
+
+                view.Focused += (sender, e) => EditorFrameFocused?.Invoke(sender, e);
+                line[i] = view;
+            }
+
+            return line;
+        }
+
+        public FrameGroup GetEditorFrames() =>
+            FrameGroup.Singleton(new Frame.Builder()
+                .WithTopLine(ToEditorLine(columnSandwiches))
+                .WithLeftLine(ToEditorLine(rowSandwiches))
                 .Build());
 
         private JArray ToJArray(int[] array)

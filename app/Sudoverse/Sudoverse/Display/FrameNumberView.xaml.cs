@@ -8,7 +8,7 @@ namespace Sudoverse.Display
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class FrameNumberView : ContentView
     {
-        private const double FONT_SIZE_FACTOR = 0.4;
+        public const double FONT_SIZE_FACTOR = 0.4;
 
         public FrameNumberView()
         {

@@ -54,6 +54,11 @@ namespace Sudoverse
 			App.Current.MainPage = new PlayOptionsPage();
 		}
 
+		private void OnEditor(object sender, EventArgs e)
+        {
+			App.Current.MainPage = new EditorOptionsPage();
+        }
+
 		private void OnContinue(object sender, EventArgs e)
         {
 			App.Current.MainPage = new PlayPage(SaveManager.LoadCurrent());

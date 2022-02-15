@@ -9,9 +9,17 @@ namespace Sudoverse
     /// </summary>
     public static class SaveManager
     {
-        private static readonly string CurrentFileName = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "current.json");
+        private static readonly string CurrentFileName = GetLocalPath("current.json");
+        private static readonly string PuzzleDirectory = GetLocalPath("puzzles");
+
+        private static string GetLocalPath(string path) =>
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path);
+
+        static SaveManager()
+        {
+            Directory.CreateDirectory(PuzzleDirectory);
+        }
 
         /// <summary>
         /// Indicates whether there is a current Sudoku to continue at the moment.
@@ -39,6 +47,16 @@ namespace Sudoverse
         public static void RemoveCurrent()
         {
             File.Delete(CurrentFileName);
+        }
+
+        /// <summary>
+        /// Saves the given Sudoku as a puzzle (i.e. without any pencilmarks) under the given name.
+        /// </summary>
+        public static void SavePuzzle(Sudoku sudoku, string name)
+        {
+            // TODO handle names that are invalid paths
+            var path = Path.Combine(PuzzleDirectory, name + ".json");
+            File.WriteAllText(path, sudoku.ToJson());
         }
     }
 }

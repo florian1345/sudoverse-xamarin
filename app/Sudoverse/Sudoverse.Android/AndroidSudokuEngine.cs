@@ -13,5 +13,11 @@ namespace Sudoverse.Droid
 
         public int Test() =>
             EngineSo.Test();
+
+        public string Fill(string json) =>
+            EngineSo.Fill(json);
+
+        public byte IsSolvable(string json) =>
+            EngineSo.IsSolvable(json);
     }
 }

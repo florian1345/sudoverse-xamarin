@@ -18,5 +18,11 @@ namespace Engine
 
         [DllImport(DllName, EntryPoint = "check")]
         public static extern string Check(string json);
+
+        [DllImport(DllName, EntryPoint = "fill")]
+        public static extern string Fill(string json);
+
+        [DllImport(DllName, EntryPoint = "is_solvable")]
+        public static extern byte IsSolvable(string json);
     }
 }

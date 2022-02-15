@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sudoverse.Util
 {
@@ -8,6 +9,16 @@ namespace Sudoverse.Util
     /// </summary>
     internal static class Utils
     {
+        /// <summary>
+        /// Creates a new array tht contains the given element <tt>count</tt> times.
+        /// </summary>
+        /// <typeparam name="T">The element type of the resulting array.</typeparam>
+        /// <param name="element">The element to repeat.</param>
+        /// <param name="count">The number of times to repeat the element.</param>
+        /// <returns>A new array tht contains the given element <tt>count</tt> times.</returns>
+        public static T[] ArrayRepeat<T>(T element, int count) =>
+            Enumerable.Repeat(element, count).ToArray();
+
         /// <summary>
         /// Creates a new array that contains all elements in <tt>a</tt> followed by all elements
         /// in <tt>b</tt>.

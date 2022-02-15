@@ -6,7 +6,6 @@
     <ScrollView>
         <Grid RowSpacing="25" RowDefinitions="Auto,Auto,Auto,Auto,*"
               Padding="{OnPlatform iOS='30,60,30,30', Default='30'}">
-
             <Button
                 x:Name="ButtonContinue"
                 Text="Continue"
@@ -14,7 +13,6 @@
                 Grid.Row="0"
                 Clicked="OnContinue"
                 HorizontalOptions="Center" />
-
             <Button
                 x:Name="ButtonPlay"
                 Text="Play"
@@ -22,16 +20,20 @@
                 Grid.Row="1"
                 Clicked="OnPlay"
                 HorizontalOptions="Center" />
-
+            <Button
+                x:Name="ButtonEditor"
+                Text="Editor"
+                FontAttributes="Bold"
+                Grid.Row="2"
+                Clicked="OnEditor"
+                HorizontalOptions="Center" />
             <Button
                 x:Name="ButtonSettings"
                 Text="Settings"
                 FontAttributes="Bold"
-                Grid.Row="2"
+                Grid.Row="3"
                 Clicked="OnSettings"
                 HorizontalOptions="Center" />
-
         </Grid>
     </ScrollView>
-
 </ContentPage>

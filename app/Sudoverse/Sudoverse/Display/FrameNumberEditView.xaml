@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Sudoverse.Display.FrameNumberEditView">
+    <ContentView.Content>
+        <AbsoluteLayout>
+            <Entry
+                x:Name="EntryNumber"
+                AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75"
+                AbsoluteLayout.LayoutFlags="All"
+                FontFamily="DigitFont"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill"
+                Margin="0"
+                MaxLength="2"
+                Placeholder="#"
+                Keyboard="Numeric"
+                IsSpellCheckEnabled="false"
+                IsTextPredictionEnabled="false"
+                TextChanged="OnTextChanged"
+                Focused="OnFocused" />
+        </AbsoluteLayout>
+    </ContentView.Content>
+</ContentView>
