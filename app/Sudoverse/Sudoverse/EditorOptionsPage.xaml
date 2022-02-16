@@ -26,6 +26,11 @@
                     HorizontalOptions="Center"
                     Clicked="OnBack" />
                 <Button
+                    Text="Load"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center"
+                    Clicked="OnLoad" />
+                <Button
                     Text="Edit"
                     VerticalOptions="Center" 
                     HorizontalOptions="Center"

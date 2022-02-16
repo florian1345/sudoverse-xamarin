@@ -50,15 +50,17 @@ namespace Sudoverse.SudokuModel
 
         /// <summary>
         /// Creates a new locked Sudoku cell filled with the given digit, or an unlocked, empty
-        /// cell with the given pencilmark if it is 0.
+        /// cell with the given pencilmark if it is 0. The parameter <tt>locked</tt> determines
+        /// whether the cell will be unable to be modified. It is ignored and the cell will remain
+        /// unlocked should <tt>digit</tt> be 0.
         /// </summary>
-        public SudokuCell(IPencilmark pencilmark, int digit)
+        public SudokuCell(IPencilmark pencilmark, int digit, bool locked = true)
         {
             Digit = digit;
             Pencilmark = pencilmark;
             ColorIndex = 1;
 
-            if (digit > 0)
+            if (digit > 0 && locked)
                 Locked = true;
         }
 

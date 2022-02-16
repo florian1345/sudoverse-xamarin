@@ -12,7 +12,6 @@ namespace Sudoverse
 		private static readonly Color NotationButtonSelectedBackground = Color.Gray;
 		private static readonly Color NotationButtonUnselectedBackground = Color.LightGray;
 
-		private Notation notation;
 		private Notation notation1 = Notation.Center;
 		private bool finished = false;
 
@@ -64,10 +63,10 @@ namespace Sudoverse
 
 		private void UpdateNotationButtons()
         {
-			UpdateNotationButton(ButtonNotationNormal, notation == Notation.Normal);
-			UpdateNotationButton(ButtonNotation1, notation == notation1);
-			UpdateNotationButton(ButtonNotation2, notation == Notation.Border);
-			UpdateNotationButton(ButtonNotation3, notation == Notation.Color);
+			UpdateNotationButton(ButtonNotationNormal, Notation == Notation.Normal);
+			UpdateNotationButton(ButtonNotation1, Notation == notation1);
+			UpdateNotationButton(ButtonNotation2, Notation == Notation.Border);
+			UpdateNotationButton(ButtonNotation3, Notation == Notation.Color);
 		}
 
         private void OnOne(object sender, EventArgs e)
@@ -133,7 +132,7 @@ namespace Sudoverse
 
 		private void SetNotation(Notation notation)
         {
-			this.notation = notation;
+			Notation = notation;
 			UpdateNotationButtons();
         }
 

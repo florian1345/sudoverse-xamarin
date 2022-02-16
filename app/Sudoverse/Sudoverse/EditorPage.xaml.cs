@@ -16,10 +16,10 @@ namespace Sudoverse
 		private string name;
 
         public EditorPage(IConstraint constraint)
-			: this(constraint, null) { }
+			: this(new Sudoku(3, 3, constraint, PencilmarkType.NoPencilmarkType), null) { }
 
-		public EditorPage(IConstraint constraint, string name)
-			: base(new Sudoku(3, 3, constraint, PencilmarkType.NoPencilmarkType), true)
+		public EditorPage(Sudoku sudoku, string name)
+			: base(sudoku, true)
 		{
 			InitializeComponent();
 			Layout.Children.Insert(0, SudokuView);
