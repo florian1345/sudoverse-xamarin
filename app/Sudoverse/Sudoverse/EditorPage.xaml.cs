@@ -125,7 +125,10 @@ namespace Sudoverse
 			var response = SudokuEngineProvider.Engine.Fill(SudokuView.Sudoku);
 
 			if (response.Successful)
+			{
 				SudokuView.FillWith(response.Grid);
+				OnChanged();
+			}
 			else DisplayAlert("Error", "No valid grid was found.", "Ok");
 		}
 
