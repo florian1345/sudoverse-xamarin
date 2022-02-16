@@ -26,11 +26,13 @@ namespace Sudoverse
 		protected void Enter(int digit)
 		{
 			SudokuView.Enter(digit, Notation);
+			OnChanged();
 		}
 
 		protected void Clear()
 		{
 			SudokuView.ClearSelected();
+			OnChanged();
 		}
 
 		protected abstract void OnCheckCorrect();
