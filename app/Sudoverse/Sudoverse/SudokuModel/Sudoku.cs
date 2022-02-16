@@ -182,10 +182,13 @@ namespace Sudoverse.SudokuModel
         /// Parses the rough stucture of a Sudoku from JSON. Only cells containing a big
         /// digit are transcribed, and all state except that digit is disregarded. This is used for
         /// communication with the engine. The pencilmark type must be provided, since it is not
-        /// stored in the JSON data.
+        /// stored in the JSON data. The parameter <tt>locked</tt> determines whether the cells
+        /// containing digits will be locked, i.e. unable to be modified.
         /// </summary>
-        public static Sudoku ParseJson(string json, PencilmarkType pencilmarkType) =>
-            ParseJsonWith(json, (token, ptype) => new SudokuCell(ptype.Empty(), token.ToInt()),
+        public static Sudoku ParseJson(string json, PencilmarkType pencilmarkType,
+                bool locked = true) =>
+            ParseJsonWith(json,
+                (token, ptype) => new SudokuCell(ptype.Empty(), token.ToInt(), locked),
                 pencilmarkType);
 
         /// <summary>

@@ -21,6 +21,13 @@ namespace Sudoverse
             App.Current.MainPage = new MainPage();
         }
 
+        private void OnLoad(object sender, EventArgs e)
+        {
+            var pencilmarkType = Config.PencilmarkType;
+            App.Current.MainPage =
+                new LoadPage(this, (sudoku, _) => new PlayPage(sudoku), pencilmarkType, true);
+        }
+
         private void OnStart(object sender, EventArgs e)
         {
             int constraint = ConstraintSelector.SelectedConstraintId;
