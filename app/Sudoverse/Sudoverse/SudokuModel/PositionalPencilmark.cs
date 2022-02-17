@@ -32,6 +32,9 @@ namespace Sudoverse.SudokuModel
 
         public string BottomRight => GetDigitString(9);
 
+        /// <summary>
+        /// Creates a new, initially empty positional pencilmark.
+        /// </summary>
         public PositionalPencilmark()
             : this(new SmallIntSet()) { }
 
@@ -67,6 +70,11 @@ namespace Sudoverse.SudokuModel
 
         public JToken ToJson() => digits.Data;
 
+        /// <summary>
+        /// Loads a positional pencilmark from JSON data.
+        /// </summary>
+        /// <exception cref="ParseJsonException">If the JSON data doe not represent a valid
+        /// positional pencilmark.</exception>
         public static PositionalPencilmark FromJson(JToken token) =>
             new PositionalPencilmark(new SmallIntSet(token.ToInt()));
     }

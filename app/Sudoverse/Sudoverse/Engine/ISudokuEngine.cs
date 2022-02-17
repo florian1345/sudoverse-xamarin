@@ -1,5 +1,9 @@
 ﻿namespace Sudoverse.Engine
 {
+    /// <summary>
+    /// An interface for low-level functionality provided by the <tt>engine</tt> crate. Wrap this
+    /// in an <see cref="EngineWrapper"/> to obtain easier-to-use higher-level methods.
+    /// </summary>
     public interface ISudokuEngine
     {
         /// <summary>

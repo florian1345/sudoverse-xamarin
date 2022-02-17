@@ -43,6 +43,11 @@ namespace Sudoverse.Engine
             }
         }
 
+        /// <summary>
+        /// Loads a check response from JSON data.
+        /// </summary>
+        /// <exception cref="ParseJsonException">If the JSON data does not represent a valid check
+        /// response.</exception>
         public static CheckResponse ParseJson(string json)
         {
             var token = JToken.Parse(json);

@@ -2,6 +2,9 @@
 
 namespace Sudoverse.Util
 {
+    /// <summary>
+    /// A read-only wrapper around a <see cref="Rect"/>.
+    /// </summary>
     public class ReadOnlyRect
     {
         private Rect rect;

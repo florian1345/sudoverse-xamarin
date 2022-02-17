@@ -29,6 +29,10 @@ namespace Sudoverse.Constraint
             this.rowSandwiches = rowSandwiches;
         }
 
+        /// <summary>
+        /// Creates a new, empty sandwich constraint (i.e. without any sandwich clues) for a Sudoku
+        /// of the given <tt>sudokuSize</tt>.
+        /// </summary>
         public SandwichConstraint(int sudokuSize)
             : this(Utils.ArrayRepeat(-1, sudokuSize), Utils.ArrayRepeat(-1, sudokuSize)) { }
 
@@ -113,6 +117,11 @@ namespace Sudoverse.Constraint
             return intArray;
         }
 
+        /// <summary>
+        /// Parses a sandwich constraint from the given JSON data.
+        /// </summary>
+        /// <exception cref="ParseJsonException">If the JSON data does not represent a valid
+        /// sandwich constraint.</exception>
         public static SandwichConstraint FromJsonValue(JToken token)
         {
             if (!(token is JObject jobject))

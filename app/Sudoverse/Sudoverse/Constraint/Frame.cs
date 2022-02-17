@@ -173,6 +173,9 @@ namespace Sudoverse.Constraint
         {
             private Frame frame;
 
+            /// <summary>
+            /// Creates a new builder that initially has an empty frame.
+            /// </summary>
             public Builder()
             {
                 frame = new Frame();
@@ -198,7 +201,7 @@ namespace Sudoverse.Constraint
             }
 
             /// <summary>
-            /// Sets the view to be displayed in the top line of the constructed frame. Gaps are
+            /// Sets the views to be displayed in the top line of the constructed frame. Gaps are
             /// represented by <tt>null</tt> entries. To not display a top line, simply do not call
             /// this method. The length of the line must be non-zero and equal to the length of all
             /// previously specified lines.
@@ -206,7 +209,7 @@ namespace Sudoverse.Constraint
             public Builder WithTopLine(View[] line) => WithLine(line, ref frame.topLine);
 
             /// <summary>
-            /// Sets the view to be displayed in the left line of the constructed frame. Gaps are
+            /// Sets the views to be displayed in the left line of the constructed frame. Gaps are
             /// represented by <tt>null</tt> entries. To not display a left line, simply do not
             /// call this method. The length of the line must be non-zero and equal to the length
             /// of all previously specified lines.
@@ -214,7 +217,7 @@ namespace Sudoverse.Constraint
             public Builder WithLeftLine(View[] line) => WithLine(line, ref frame.leftLine);
 
             /// <summary>
-            /// Sets the view to be displayed in the right line of the constructed frame. Gaps are
+            /// Sets the views to be displayed in the right line of the constructed frame. Gaps are
             /// represented by <tt>null</tt> entries. To not display a right line, simply do not
             /// call this method. The length of the line must be non-zero and equal to the length
             /// of all previously specified lines.
@@ -222,43 +225,70 @@ namespace Sudoverse.Constraint
             public Builder WithRightLine(View[] line) => WithLine(line, ref frame.rightLine);
 
             /// <summary>
-            /// Sets the view to be displayed in the bottom line of the constructed frame. Gaps are
-            /// represented by <tt>null</tt> entries. To not display a bottom line, simply do not
-            /// call this method. The length of the line must be non-zero and equal to the length
-            /// of all previously specified lines.
+            /// Sets the views to be displayed in the bottom line of the constructed frame. Gaps
+            /// are represented by <tt>null</tt> entries. To not display a bottom line, simply do
+            /// not call this method. The length of the line must be non-zero and equal to the
+            /// length of all previously specified lines.
             /// </summary>
             public Builder WithBottomLine(View[] line) => WithLine(line, ref frame.bottomLine);
 
+            /// <summary>
+            /// Sets the view to be displayed in the top-left corner of the constructed frame. To
+            /// not display a top-left corner, simply do not call this method.
+            /// </summary>
             public Builder WithTopLeftCorner(View corner)
             {
                 frame.TopLeftCorner = corner;
                 return this;
             }
 
+            /// <summary>
+            /// Sets the view to be displayed in the top-right corner of the constructed frame. To
+            /// not display a top-right corner, simply do not call this method.
+            /// </summary>
             public Builder WithTopRightCorner(View corner)
             {
                 frame.TopRightCorner = corner;
                 return this;
             }
 
+            /// <summary>
+            /// Sets the view to be displayed in the bottom-left corner of the constructed frame.
+            /// To not display a bottom-left corner, simply do not call this method.
+            /// </summary>
             public Builder WithBottomLeftCorner(View corner)
             {
                 frame.BottomLeftCorner = corner;
                 return this;
             }
 
+            /// <summary>
+            /// Sets the view to be displayed in the bottom-right corner of the constructed frame.
+            /// To not display a bottom-right corner, simply do not call this method.
+            /// </summary>
             public Builder WithBottomRightCorner(View corner)
             {
                 frame.BottomRightCorner = corner;
                 return this;
             }
 
+            /// <summary>
+            /// Sets the constructed frame's <see cref="FramePlacementPreference"/>, which
+            /// determines whether it will be more towards the inside or towards the outside of a
+            /// grid surrounded by multiple frames.
+            /// </summary>
             public Builder WithPlacementPreference(FramePlacementPreference placementPreference)
             {
                 frame.PlacementPreference = placementPreference;
                 return this;
             }
 
+            /// <summary>
+            /// Builds the frame.
+            /// </summary>
+            /// <returns>A frame constructed from the previously specified arguments.</returns>
+            /// <exception cref="FrameAlreadyBuiltException">If this method has already been called
+            /// on this builder.</exception>
             public Frame Build()
             {
                 if (frame == null)
