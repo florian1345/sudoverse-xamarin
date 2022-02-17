@@ -144,6 +144,11 @@ namespace Sudoverse.SudokuModel
             return set;
         }
 
+        /// <summary>
+        /// Loads a center-border pencilmark from JSON data.
+        /// </summary>
+        /// <exception cref="ParseJsonException">If the JSON data doe not represent a valid
+        /// center-border pencilmark.</exception>
         public static CenterBorderPencilmark FromJson(JToken token)
         {
             if (!(token is JObject jobject))

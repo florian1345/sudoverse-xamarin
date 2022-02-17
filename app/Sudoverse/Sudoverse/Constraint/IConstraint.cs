@@ -5,8 +5,16 @@ using Xamarin.Forms;
 
 namespace Sudoverse.Constraint
 {
+    /// <summary>
+    /// Various static utility methods for handling <see cref="IConstraint"/>s.
+    /// </summary>
     public static class ConstraintUtil
     {
+        /// <summary>
+        /// Loads a constraint from JSON data.
+        /// </summary>
+        /// <exception cref="ParseJsonException">If the JSON data does not represent a valid
+        /// constraint.</exception>
         public static IConstraint FromJson(JToken jtoken)
         {
             if (!(jtoken is JObject jobject))
@@ -36,6 +44,9 @@ namespace Sudoverse.Constraint
             throw new ParseJsonException();
         }
 
+        /// <summary>
+        /// Converts the given constraint into JSON data.
+        /// </summary>
         public static JToken ToJson(IConstraint constraint)
         {
             var jobject = new JObject();
@@ -49,6 +60,11 @@ namespace Sudoverse.Constraint
         }
     }
 
+    /// <summary>
+    /// Specifies behavior that relates to a constraint's appearance. A constraint is a condution
+    /// that applies to a Sudoku grid. Note that the constraint's logic is implemented by the
+    /// engine. It also serves identification purposes for communication with the engine.
+    /// </summary>
     public interface IConstraint
     {
         /// <summary>

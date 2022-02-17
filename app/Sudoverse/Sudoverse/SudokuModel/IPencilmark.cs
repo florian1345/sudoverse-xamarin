@@ -10,6 +10,9 @@ namespace Sudoverse.SudokuModel
     /// </summary>
     public sealed class UnsupportedNotationException : Exception
     {
+        /// <summary>
+        /// Creates a new unsupported notation exception with a generic message.
+        /// </summary>
         public UnsupportedNotationException()
             : base("The used pencilmark type does not support the given notation.") { }
     }

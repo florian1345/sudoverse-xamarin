@@ -65,10 +65,10 @@ namespace Sudoverse.SudokuModel
         }
 
         /// <summary>
-        /// Clears the top layer of this cell, i.e. the big digit, if there is one, or the small-
-        /// and corner-digits otherwise. A cell with annotations and a digit requires clearing
-        /// twice. Returns an enumeration of all digits with their notation that need to be entered
-        /// for the previous state to be restored.
+        /// Clears the top layer of this cell, i.e. the big digit, if there is one, or the
+        /// pencilmark otherwise. A cell with pencilmark and a digit requires clearing twice.
+        /// Returns an enumeration of all digits with their notation that need to be entered for
+        /// the previous state to be restored.
         /// </summary>
         public IEnumerable<(int, Notation)> Clear()
         {
@@ -138,6 +138,10 @@ namespace Sudoverse.SudokuModel
             return false;
         }
 
+        /// <summary>
+        /// Converts this Sudoku cell to JSON data, which can be parsed using
+        /// <see cref="ParseJson(JToken, PencilmarkType)"/> later.
+        /// </summary>
         public JObject ToJson()
         {
             var pencilmark = Pencilmark.ToJson();
@@ -151,6 +155,15 @@ namespace Sudoverse.SudokuModel
             };
         }
         
+        /// <summary>
+        /// Loads a Sudoku cell from JSON data.
+        /// </summary>
+        /// <param name="token">The JSON data.</param>
+        /// <param name="pencilmarkType">The <see cref="PencilmarkType"/> of the loaded cell. This
+        /// must either be known, or may be possible to deduce from the JSON data of the entire
+        /// Sudoku.</param>
+        /// <exception cref="ParseJsonException">If the JSON data does not represent a valid Sudoku
+        /// cell with the given pencilmark type.</exception>
         public static SudokuCell ParseJson(JToken token, PencilmarkType pencilmarkType)
         {
             if (!(token is JObject jobject))

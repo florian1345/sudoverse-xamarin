@@ -15,6 +15,10 @@ namespace Sudoverse.Constraint
 
         public string Type { get; }
 
+        /// <summary>
+        /// Creates a new stateless constraint for a constraint with the given <tt>type</tt>
+        /// identifier.
+        /// </summary>
         public StatelessConstraint(string type)
         {
             Type = type;

@@ -7,12 +7,39 @@ using System.Linq;
 
 namespace Sudoverse.SudokuModel
 {
+    /// <summary>
+    /// A Sudoku that can be manipulated. It stores <see cref="SudokuCell"/>s, which store the
+    /// state of each of the cells in the grid.
+    /// </summary>
     public sealed class Sudoku
     {
+        /// <summary>
+        /// The width of a single block of the Sudoku in number of cells. In an ordinary Sudoku,
+        /// the blocks are 3x3, so this would be 3.
+        /// </summary>
         public int BlockWidth { get; private set; }
+
+        /// <summary>
+        /// The height of a single block of the Sudoku in number of cells. In an ordinary Sudoku,
+        /// the blocks are 3x3, so this would be 3.
+        /// </summary>
         public int BlockHeight { get; private set; }
+
+        /// <summary>
+        /// The number of cells of the Sudoku along any one axis. As Sudoku are meant to be
+        /// squares, this represents both its width and height.
+        /// </summary>
         public int Size { get; private set; }
+
+        /// <summary>
+        /// The <see cref="IConstraint"/> that applies to this Sudoku.
+        /// </summary>
         public IConstraint Constraint { get; private set; }
+
+        /// <summary>
+        /// The <see cref="SudokuModel.PencilmarkType"/> that determines which style of
+        /// pencilmarking the cells of this Sudoku support.
+        /// </summary>
         public PencilmarkType PencilmarkType { get; }
 
         /// <summary>
@@ -22,6 +49,23 @@ namespace Sudoverse.SudokuModel
 
         private SudokuCell[] cells;
 
+        /// <summary>
+        /// Creates a new, initially empty Sudoku with the given dimensions, constraint, and
+        /// pencilmark type.
+        /// </summary>
+        /// <param name="blockWidth">The width of a single block of the Sudoku in number of cells.
+        /// In an ordinary Sudoku, the blocks are 3x3, so this would be 3. Must be positive.
+        /// </param>
+        /// <param name="blockHeight">The height of a single block of the Sudoku in number of
+        /// cells. In an ordinary Sudoku, the blocks are 3x3, so this would be 3. Must be positive.
+        /// </param>
+        /// <param name="constraint">The <see cref="IConstraint"/> that applies to the created
+        /// Sudoku.</param>
+        /// <param name="pencilmarkType">The <see cref="SudokuModel.PencilmarkType"/> that
+        /// determines which style of pencilmarking the cells of the created Sudoku should support.
+        /// </param>
+        /// <exception cref="ArgumentException">If <tt>blockWidth</tt> or <tt>blockHeight</tt> are
+        /// less than 1.</exception>
         public Sudoku(int blockWidth, int blockHeight, IConstraint constraint,
             PencilmarkType pencilmarkType)
         {
@@ -41,6 +85,10 @@ namespace Sudoverse.SudokuModel
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="SudokuCell"/> in the given <tt>column</tt> and <tt>row</tt> of this
+        /// Sudoku's grid.
+        /// </summary>
         public SudokuCell GetCell(int column, int row) =>
             cells[row * Size + column];
 
@@ -72,6 +120,12 @@ namespace Sudoverse.SudokuModel
             return new NoOperation();
         }
 
+        /// <summary>
+        /// Clears the top layer of the cell in the given <tt>column</tt> and <tt>row</tt>, i.e.
+        /// removes the big digit, if there is one, and clears the pencilmark otherwise. A cell
+        /// with pencilmark and big digit must be cleared twice.
+        /// </summary>
+        /// <returns>An operation to revert this action.</returns>
         public Operation ClearCell(int column, int row)
         {
             var cell = GetCell(column, row);

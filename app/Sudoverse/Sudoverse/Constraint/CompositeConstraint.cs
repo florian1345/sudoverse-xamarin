@@ -10,7 +10,10 @@ using Xamarin.Forms;
 
 namespace Sudoverse.Constraint
 {
-    internal sealed class CompositeConstraint : IConstraint
+    /// <summary>
+    /// A <see cref="IConstraint"/> that consists of a list of sub-constraints.
+    /// </summary>
+    public sealed class CompositeConstraint : IConstraint
     {
         public event EventHandler EditorFrameFocused;
 
@@ -29,6 +32,9 @@ namespace Sudoverse.Constraint
             }
         }
 
+        /// <summary>
+        /// Creates a new composite constraints from its sub-<tt>constraints</tt>.
+        /// </summary>
         public CompositeConstraint(params IConstraint[] constraints)
             : this(constraints.ToList()) { }
 
@@ -58,6 +64,11 @@ namespace Sudoverse.Constraint
             return jarray;
         }
 
+        /// <summary>
+        /// Loads a composite constraint from JSON data.
+        /// </summary>
+        /// <exception cref="ParseJsonException">If the JSON data does not represent a valid
+        /// composite constraint.</exception>
         public static IConstraint FromJsonValue(JToken token)
         {
             if (token.Type != JTokenType.Array)
