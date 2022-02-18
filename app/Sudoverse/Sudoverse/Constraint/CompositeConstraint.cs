@@ -4,6 +4,7 @@ using Sudoverse.Util;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Xamarin.Forms;
@@ -16,19 +17,32 @@ namespace Sudoverse.Constraint
     public sealed class CompositeConstraint : IConstraint
     {
         public event EventHandler EditorFrameFocused;
+        public event EventHandler<ConstraintOperation> Changed;
 
         private List<IConstraint> constraints;
 
         public string Type => "composite";
 
+        /// <summary>
+        /// A <see cref="ReadOnlyCollection{T}"/> that contains all subconstraints of this
+        /// composite constraint.
+        /// </summary>
+        public ReadOnlyCollection<IConstraint> Constraints =>
+            new ReadOnlyCollection<IConstraint>(constraints);
+
         private CompositeConstraint(List<IConstraint> constraints)
         {
             this.constraints = constraints;
 
-            foreach (var constraint in this.constraints)
+            for (int i = 0; i < this.constraints.Count; i++)
             {
+                var constraint = this.constraints[i];
+                var fi = i;
+
                 constraint.EditorFrameFocused += (sender, e) =>
                     EditorFrameFocused?.Invoke(sender, e);
+                constraint.Changed += (sender, op) =>
+                    Changed?.Invoke(sender, new CompositeConstraintOperation(fi, op));
             }
         }
 

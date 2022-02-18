@@ -114,6 +114,8 @@ namespace Sudoverse.Display
             ControlDown = new SharedFlag();
             undos = new DropOutStack<Operation>(UNDO_CAPACITY);
             redos = new DropOutStack<Operation>(UNDO_CAPACITY);
+
+            Sudoku.Constraint.Changed += (sender, op) => PushUndo(op);
         }
 
         private void PushUndo(Operation operation)

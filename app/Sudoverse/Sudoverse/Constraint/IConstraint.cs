@@ -75,6 +75,13 @@ namespace Sudoverse.Constraint
         event EventHandler EditorFrameFocused;
 
         /// <summary>
+        /// This event is raised whenever the data of this constraint has changed. It carries as an
+        /// argument a <see cref="ConstraintOperation"/> that reverts the change. Note this event
+        /// is <i>not</i> raised if the change is itself a result of an operation being applied.
+        /// </summary>
+        event EventHandler<ConstraintOperation> Changed;
+
+        /// <summary>
         /// The textual type identifier of this constraint.
         /// </summary>
         string Type { get; }

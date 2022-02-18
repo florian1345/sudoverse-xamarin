@@ -9,9 +9,10 @@ namespace Sudoverse.Constraint
     /// A <see cref="IConstraint"/> that does not hold any additional information besides its type,
     /// such as a column constraint or a row constraint.
     /// </summary>
-    internal sealed class StatelessConstraint : IConstraint
+    public sealed class StatelessConstraint : IConstraint
     {
         public event EventHandler EditorFrameFocused;
+        public event EventHandler<ConstraintOperation> Changed;
 
         public string Type { get; }
 
