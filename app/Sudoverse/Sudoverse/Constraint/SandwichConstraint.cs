@@ -17,9 +17,16 @@ namespace Sudoverse.Constraint
     public sealed class SandwichConstraint : IConstraint
     {
         public event EventHandler EditorFrameFocused;
+        public event EventHandler<ConstraintOperation> Changed;
+        public event EventHandler ChangedInternal;
 
         private int[] columnSandwiches;
         private int[] rowSandwiches;
+
+        /// <summary>
+        /// The number of sandwich clues in each line (top and left, i.e. for columns and rows).
+        /// </summary>
+        public int SudokuSize => columnSandwiches.Length;
 
         public string Type => "sandwich";
 
@@ -27,6 +34,7 @@ namespace Sudoverse.Constraint
         {
             this.columnSandwiches = columnSandwiches;
             this.rowSandwiches = rowSandwiches;
+            Changed += (sender, op) => ChangedInternal?.Invoke(sender, new EventArgs());
         }
 
         /// <summary>
@@ -35,6 +43,76 @@ namespace Sudoverse.Constraint
         /// </summary>
         public SandwichConstraint(int sudokuSize)
             : this(Utils.ArrayRepeat(-1, sudokuSize), Utils.ArrayRepeat(-1, sudokuSize)) { }
+
+        /// <summary>
+        /// Gets the sandwich sum annotated for the column with the given <tt>index</tt>, or -1 if
+        /// there is no sum.
+        /// </summary>
+        public int GetColumnSandwich(int index) => columnSandwiches[index];
+
+        /// <summary>
+        /// Gets the sandwich sum annotated for the row with the given <tt>index</tt>, or -1 if
+        /// there is no sum.
+        /// </summary>
+        public int GetRowSandwich(int index) => rowSandwiches[index];
+
+        private int SetSandwich(int[] sandwiches, int index, int sum, bool raiseEvent,
+            SandwichSumAxis axis)
+        {
+            int old = sandwiches[index];
+            sandwiches[index] = sum;
+
+            if (old != sum)
+            {
+                if (raiseEvent)
+                {
+                    ConstraintOperation reverse;
+
+                    if (old == -1) reverse = new ClearSandwichSumConstraintOperation(axis, index);
+                    else reverse = new SetSandwichSumConstraintOperation(axis, index, old);
+
+                    Changed?.Invoke(this, reverse);
+                }
+                else ChangedInternal?.Invoke(this, new EventArgs());
+            }
+
+            return old;
+        }
+
+        /// <summary>
+        /// Sets the sandwich sum annotated for the column with the given <tt>index</tt> to the
+        /// given <tt>sum</tt>. If you want to clear the sum, use
+        /// <see cref="ClearColumnSandwich(int)"/> instead. Returns the old sum at that position,
+        /// or -1 if there was none. If <tt>raiseEvent</tt> is set to false, <see cref="Changed"/>
+        /// will not be invoked.
+        /// </summary>
+        public int SetColumnSandwich(int index, int sum, bool raiseEvent = true) =>
+            SetSandwich(columnSandwiches, index, sum, raiseEvent, SandwichSumAxis.Columns);
+
+        /// <summary>
+        /// Sets the sandwich sum annotated for the row with the given <tt>index</tt> to the given
+        /// <tt>sum</tt>. If you want to clear the sum, use <see cref="ClearRowSandwich(int)"/>
+        /// instead. Returns the old sum at that position, or -1 if there was none. If
+        /// <tt>raiseEvent</tt> is set to false, <see cref="Changed"/> will not be invoked.
+        /// </summary>
+        public int SetRowSandwich(int index, int sum, bool raiseEvent = true) =>
+            SetSandwich(rowSandwiches, index, sum, raiseEvent, SandwichSumAxis.Rows);
+
+        /// <summary>
+        /// Removes the sandwich sum annotated for the column with the given <tt>index</tt>.
+        /// Returns the old sum at that position, or -1 if there was none. If <tt>raiseEvent</tt>
+        /// is set to false, <see cref="Changed"/> will not be invoked.
+        /// </summary>
+        public int ClearColumnSandwich(int index, bool raiseEvent = true) =>
+            SetSandwich(columnSandwiches, index, -1, raiseEvent, SandwichSumAxis.Columns);
+
+        /// <summary>
+        /// Removes the sandwich sum annotated for the row with the given <tt>index</tt>. Returns
+        /// the old sum at that position, or -1 if there was none. If <tt>raiseEvent</tt> is set to
+        /// false, <see cref="Changed"/> will not be invoked.
+        /// </summary>
+        public int ClearRowSandwich(int index, bool raiseEvent = true) =>
+            SetSandwich(rowSandwiches, index, -1, raiseEvent, SandwichSumAxis.Rows);
 
         public View[] GetBackgroundViews(ReadOnlyMatrix<ReadOnlyRect> fieldBounds) =>
             new View[0];
@@ -59,7 +137,8 @@ namespace Sudoverse.Constraint
                 .WithLeftLine(ToFrameLine(rowSandwiches))
                 .Build());
 
-        private View[] ToEditorLine(int[] sandwiches)
+        private View[] ToEditorLine(int[] sandwiches, Func<int, int, int> setter,
+            Func<int, int> clearer)
         {
             var line = new View[sandwiches.Length];
 
@@ -70,7 +149,14 @@ namespace Sudoverse.Constraint
 
                 view.NumberChanged += (sender, e) =>
                 {
-                    sandwiches[fi] = view.Number == null ? -1 : (int)view.Number;
+                    if (view.Number == null) clearer(fi);
+                    else setter(fi, (int)view.Number);
+                };
+
+                ChangedInternal += (sender, e) =>
+                {
+                    if (sandwiches[fi] == -1) view.Number = null;
+                    else view.Number = sandwiches[fi];
                 };
 
                 view.Focused += (sender, e) => EditorFrameFocused?.Invoke(sender, e);
@@ -82,8 +168,12 @@ namespace Sudoverse.Constraint
 
         public FrameGroup GetEditorFrames() =>
             FrameGroup.Singleton(new Frame.Builder()
-                .WithTopLine(ToEditorLine(columnSandwiches))
-                .WithLeftLine(ToEditorLine(rowSandwiches))
+                .WithTopLine(ToEditorLine(columnSandwiches,
+                    (column, sum) => SetColumnSandwich(column, sum),
+                    column => ClearColumnSandwich(column)))
+                .WithLeftLine(ToEditorLine(rowSandwiches,
+                    (row, sum) => SetRowSandwich(row, sum),
+                    row => ClearRowSandwich(row)))
                 .Build());
 
         private JArray ToJArray(int[] array)
@@ -129,6 +219,9 @@ namespace Sudoverse.Constraint
 
             var columnSandwiches = ToIntArray(jobject.GetField<JArray>("columns"));
             var rowSandwiches = ToIntArray(jobject.GetField<JArray>("rows"));
+
+            if (columnSandwiches.Length != rowSandwiches.Length)
+                throw new ParseJsonException();
 
             return new SandwichConstraint(columnSandwiches, rowSandwiches);
         }

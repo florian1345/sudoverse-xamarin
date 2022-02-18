@@ -9,6 +9,8 @@ namespace Sudoverse.Display
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class FrameNumberEditView : ContentView
     {
+        private int? number;
+
         /// <summary>
         /// An event raised whenever <see cref="Number"/> changed.
         /// </summary>
@@ -22,12 +24,24 @@ namespace Sudoverse.Display
         /// <summary>
         /// The number currently input in this edit view, or <tt>null</tt> if it is empty.
         /// </summary>
-        public int? Number { get; private set; }
+        public int? Number
+        {
+            get => number;
+            set
+            {
+                if (value != number)
+                {
+                    number = value;
+                    EntryNumber.Text = number == -1 ? "" : number.ToString();
+                    NumberChanged?.Invoke(this, new EventArgs());
+                }
+            }
+        }
 
         public FrameNumberEditView()
         {
             InitializeComponent();
-            Number = null;
+            number = null;
         }
 
         private void OnTextChanged(object sender, EventArgs e)
@@ -36,13 +50,8 @@ namespace Sudoverse.Display
 
             if (Regex.IsMatch(text, @"^[0-9]*?$"))
             {
-                int? oldNumber = Number;
-
                 if (text.Length == 0) Number = null;
                 else Number = int.Parse(text);
-
-                if (Number != oldNumber)
-                    NumberChanged?.Invoke(sender, e);
             }
             else if (Number == null) EntryNumber.Text = "";
             else EntryNumber.Text = Number.ToString();
