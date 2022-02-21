@@ -119,7 +119,7 @@ namespace Sudoverse.Constraint
 
         private View ToFrameView(int sandwich)
         {
-            if (sandwich > 0)
+            if (sandwich >= 0)
             {
                 var view = new FrameNumberView();
                 view.DisplayNumber(sandwich);
@@ -158,6 +158,8 @@ namespace Sudoverse.Constraint
                     if (sandwiches[fi] == -1) view.Number = null;
                     else view.Number = sandwiches[fi];
                 };
+
+                if (sandwiches[fi] >= 0) view.Number = sandwiches[fi];
 
                 view.Focused += (sender, e) => EditorFrameFocused?.Invoke(sender, e);
                 line[i] = view;
